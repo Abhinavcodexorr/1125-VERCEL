@@ -1,0 +1,340 @@
+@import "tailwindcss";
+
+body {
+  background: #f5f3ed;
+}
+
+
+@font-face {
+  font-family: "ogg-trial";
+  src: url("/fonts/OggTRIAL.eot");
+  font-style: normal;
+  font-weight: normal;
+}
+
+.font-ogg-trial {
+  font-family: "ogg-trial";
+}
+
+@font-face {
+  font-family: "Ogg Regular";
+  src: url("/fonts/Ogg Ogg Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-ogg-regular {
+  font-family: "Ogg Regular";
+}
+
+@font-face {
+  font-family: "Jako Medium";
+  src: url("/fonts/FontsFree-Net-Jeko-Medium.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-jako-medium {
+  font-family: "Jako Medium";
+}
+
+@font-face {
+  font-family: "Jako Bold";
+  src: url("/fonts/FontsFree-Net-Jeko-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-jako-bold {
+  font-family: "Jako Bold";
+}
+
+@font-face {
+  font-family: "Jako Regular";
+  src: url("/fonts/FontsFree-Net-Jeko-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-jako-regular {
+  font-family: "Jako Regular";
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/FontsFree-Net-Jeko-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-manrope-regular {
+  font-family: "Manrope";
+}
+
+@font-face {
+  font-family: "Jeko Black";
+  src: url("/fonts/FontsFree-Net-Jeko-Black.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-jeko-black {
+  font-family: "Jeko Black";
+}
+
+.font-manrope-regular {
+  font-family: "Manrope";
+}
+
+/* Hero Shape */
+.hero-mask {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 40px 40px;
+}
+
+/* Top Curves */
+.hero-mask::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+
+  background:
+    radial-gradient(circle at 8% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 20% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 32% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 44% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 56% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 68% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 80% 0%, #f5f3ed 60px, transparent 61px),
+    radial-gradient(circle at 92% 0%, #f5f3ed 60px, transparent 61px);
+
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Bottom Curves */
+.hero-mask::after {
+  content: "";
+  position: absolute;
+  bottom: -45px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  z-index: 5;
+
+  background:
+    radial-gradient(circle at 5% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 15% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 25% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 35% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 45% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 55% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 65% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 75% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 85% 0, #f5f3ed 45px, transparent 46px),
+    radial-gradient(circle at 95% 0, #f5f3ed 45px, transparent 46px);
+
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Figma-style arch shape */
+.hero-mask {
+  clip-path: polygon(
+    6% 20%,
+    12% 0%,
+    18% 20%,
+
+    25% 0%,
+    31% 20%,
+
+    38% 0%,
+    44% 20%,
+
+    51% 0%,
+    57% 20%,
+
+    64% 0%,
+    70% 20%,
+
+    77% 0%,
+    83% 20%,
+
+    90% 0%,
+    96% 20%,
+
+    100% 35%,
+    100% 85%,
+
+    95% 100%,
+    85% 96%,
+    75% 100%,
+    65% 96%,
+    55% 100%,
+    45% 96%,
+    35% 100%,
+    25% 96%,
+    15% 100%,
+    5% 96%,
+
+    0% 85%,
+    0% 35%
+  );
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero-mask {
+    height: 520px !important;
+  }
+}
+
+.hero-mask {
+  -webkit-mask-image: url('/shapes/hero-mask.svg');
+  mask-image: url('/shapes/hero-mask.svg');
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+.footer-title {
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.footer-link {
+  transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+  opacity: 1;
+}
+
+.react-datepicker {
+  background: #FFFEF8 !important;
+  border: 1px solid #e5e5e5 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.react-datepicker__header {
+  background: #FFFEF8 !important;
+  border-bottom: 1px solid #e5e5e5 !important;
+}
+
+/* Month Title */
+.react-datepicker__current-month {
+  color: #111827 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+/* Days Name */
+.react-datepicker__day-name {
+  color: #111827 !important;
+  font-weight: 500;
+}
+
+/* Normal Days */
+.react-datepicker__day {
+  color: #111827 !important;
+  border-radius: 8px;
+}
+
+/* Hover */
+.react-datepicker__day:hover {
+  background: #BC2623 !important;
+  color: white !important;
+}
+
+/* Selected Day */
+.react-datepicker__day--selected {
+  background: #BC2623 !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+/* Today */
+.react-datepicker__day--today {
+  font-weight: 700 !important;
+}
+
+/* Navigation Arrows */
+.react-datepicker__navigation-icon::before {
+  border-color: #111827 !important;
+}
+
+/* Outside Month Dates */
+.react-datepicker__day--outside-month {
+  color: #9ca3af !important;
+}
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
+
+.react-datepicker__triangle {
+  display: none !important;
+}
+.react-datepicker-wrapper{
+  width:100%;
+}
+
+.react-datepicker__input-container{
+  width:100%;
+}
+
+.react-datepicker__input-container input{
+  border:none;
+  outline:none;
+  width:100%;
+}
+
+/* Hide scrollbar but keep scrolling */
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+
+.react-datepicker-wrapper input {
+  color: #425a70 !important;
+}
+
+
+.react-datepicker__day--disabled {
+  color: #ccc !important;
+  cursor: not-allowed !important;
+  background-none: transparent !important;
+}
+
+.react-datepicker__day--disabled {
+  color: #ccc !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  background: transparent !important;
+}
+
+.react-datepicker__day--disabled:hover {
+  background: transparent !important;
+  color: #ccc !important;
+}

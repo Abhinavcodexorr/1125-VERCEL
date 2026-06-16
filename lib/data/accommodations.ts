@@ -1,0 +1,75 @@
+export const accommodations = [
+  {
+    id: 1,
+    slug: "5-bedroom-beach-house",
+    category: "villa",
+    subtitle: "5-BEDROOM BEACH RESIDENCE",
+    title: "The Villa",
+    price: 650,
+    guests: 10,
+    area: 450,
+    image: "/images/accommodations/villa.jpg",
+    description:
+      "Our premium offering for large families or groups. Features a private pool, direct beach access, and expansive living areas designed for total immersion in the coastal lifestyle.",
+    features: [
+      "Private Pool",
+      "Beach Access",
+      "Full Kitchen",
+      "Ocean View",
+    ],
+  },
+  {
+    id: 2,
+    slug: "deluxe-room",
+    category: "room",
+    subtitle: "PREMIUM OCEAN-VIEW SUITE",
+    title: "Deluxe Room",
+    price: 350,
+    guests: 2,
+    area: 60,
+    image: "/images/accommodations/deluxe.jpg",
+    description:
+      "A spacious room with premium furnishings, perfect for a luxurious getaway.",
+    features: [
+      "King Bed",
+      "Mini-bar",
+      "Balcony",
+    ],
+  },
+  {
+    id: 3,
+    slug: "standard-room",
+    category: "room",
+    subtitle: "COMFORTABLE COASTAL RETREAT",
+    title: "Standard Room",
+    price: 250,
+    guests: 2,
+    area: 45,
+    image: "/images/accommodations/standard.jpg",
+    description:
+      "Comfortable and thoughtfully designed.",
+    features: [
+      "Queen Bed",
+      "Air Conditioning",
+      "Smart TV",
+    ],
+  },
+  {
+    id: 4,
+    slug: "chalets", // <-- यहाँ सही स्लग कर दिया
+    category: "room",
+    subtitle: "EXCLUSIVE COASTAL CHALETS",
+    title: "Chalets", // <-- यहाँ सही नाम कर दिया
+    price: 250,
+    guests: 2,
+    area: 45,
+    image: "/images/accommodations/50deabec7df2ce9855d14e5125d8b2a525e84eb8 (1).jpg",
+    description:
+      "Comfortable and thoughtfully designed chalets near the beach.",
+    features: [
+      "Queen Bed",
+      "Air Conditioning",
+      "Smart TV",
+    ],
+  },
+];
