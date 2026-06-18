@@ -87,7 +87,7 @@ export default function ChaletSection() {
               alt="Chalet"
               fill
               priority
-              className="object-cover"
+              sizes="100vw" className="object-cover"
             />
           </motion.div>
         </AnimatePresence>

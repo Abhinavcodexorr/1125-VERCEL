@@ -48,6 +48,7 @@ export default function EventsPage() {
             alt="Experience"
             fill
             priority
+            sizes="calc(100vw - 2rem)"
             className="object-cover"
           />
 
@@ -85,6 +86,7 @@ export default function EventsPage() {
                 src="/images/wedding.jpg"
                 alt="Wedding"
                 fill
+                sizes="(max-width: 768px) calc(100vw - 3rem), min(680px, 50vw)"
                 className="object-cover"
               />
             </div>
@@ -116,6 +118,7 @@ export default function EventsPage() {
                 src="/images/corporate.jpg"
                 alt="Corporate"
                 fill
+                sizes="(max-width: 768px) calc(100vw - 3rem), min(680px, 50vw)"
                 className="object-cover"
               />
             </div>

@@ -35,6 +35,7 @@ export default function ContactPage() {
               alt="Banner"
               fill
               priority
+              sizes="calc(100vw - 2rem)"
               className="object-cover"
             />
           </motion.div>
@@ -105,6 +106,7 @@ export default function ContactPage() {
                 src="/images/contact-room.jpg"
                 alt="Room"
                 fill
+                sizes="(max-width: 1024px) 100vw, 600px"
                 className="object-cover"
               />
 

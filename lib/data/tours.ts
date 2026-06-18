@@ -40,20 +40,4 @@ export const tours: TourItem[] = [
     labelType: "Capacity",
     labelValue: "4 Guests",
   },
-    {
-    id: 3,
-    image: "/images/hero.jpg",
-    title: "The Villa",
-    feature: "Private Ocean-Facing Pool, Open-Plan Living",
-    labelType: "Occupancy",
-    labelValue: "10",
-  },
-  {
-    id: 4,
-    image: "/images/hero.jpg",
-    title: "Oceanfront Suite",
-    feature: "Panoramic Views",
-    labelType: "Capacity",
-    labelValue: "4 Guests",
-  },
 ];

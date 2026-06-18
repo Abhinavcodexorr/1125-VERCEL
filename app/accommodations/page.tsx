@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { accommodations } from "@/lib/data/accommodations";
 import Link from "next/link";
-import { motion, Variants } from "framer-motion"; // Animation imports
+import { motion, Variants } from "framer-motion";
+import {
+  fetchRoomsClient,
+  mapRoomsToAccommodationListings,
+  type AccommodationListing,
+} from "@/lib/api/rooms";
+import { accommodations as staticAccommodations } from "@/lib/data/accommodations";
 
 // Animation Variants (TypeScript safe)
 const fadeInUp: Variants = {
@@ -16,15 +21,56 @@ const fadeInUp: Variants = {
   }
 };
 
+function mapStaticToListing(
+  item: (typeof staticAccommodations)[number]
+): AccommodationListing {
+  return {
+    id: String(item.id),
+    slug: item.slug,
+    category: item.category as "villa" | "room",
+    subtitle: item.subtitle,
+    title: item.title,
+    price: item.price,
+    formattedPrice: `GHS ${item.price} / night`,
+    guests: item.guests,
+    area: item.area,
+    areaUnit: "sq m",
+    image: item.image,
+    description: item.description,
+    features: item.features,
+  };
+}
+
 export default function AccommodationsPage() {
+    const [listings, setListings] = useState<AccommodationListing[]>(() =>
+        staticAccommodations.map(mapStaticToListing)
+    );
     const [filter, setFilter] = useState("all");
     const [priceOpen, setPriceOpen] = useState(false);
     const [occupancyOpen, setOccupancyOpen] = useState(false);
 
+    useEffect(() => {
+        let cancelled = false;
+
+        fetchRoomsClient()
+            .then((rooms) => {
+                if (!cancelled && rooms.length) {
+                    setListings(mapRoomsToAccommodationListings(rooms));
+                }
+            })
+            .catch(() => {
+                // Keep static fallback
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
     const filtered =
         filter === "all"
-            ? accommodations
-            : accommodations.filter(
+            ? listings
+            : listings.filter(
                 (item) => item.category === filter
             );
 
@@ -44,6 +90,7 @@ export default function AccommodationsPage() {
                         alt="Experience"
                         fill
                         priority
+                        sizes="calc(100vw - 2rem)"
                         className="object-cover"
                     />
 
@@ -186,6 +233,7 @@ export default function AccommodationsPage() {
                                     src={item.image}
                                     alt={item.title}
                                     fill
+                                    sizes="(max-width: 1024px) calc(100vw - 3rem), min(720px, 50vw)"
                                     className="object-cover"
                                 />
                             </div>
@@ -201,7 +249,7 @@ export default function AccommodationsPage() {
                                 </h2>
 
                                 <p className="text-[#AE2020] text-[17.6px] mt-2 font-[400] font-jako-bold">
-                                    Starting from GHS {item.price} / night
+                                    Starting from {item.formattedPrice}
                                 </p>
 
                                 <p className="mt-6 text-[#6B6B6B] text-[15px] font-[400] leading-relaxed max-w-[520px] font-light font-manrope-regular">
@@ -233,12 +281,12 @@ export default function AccommodationsPage() {
                                     </span>
                                     <span className="flex items-center gap-1.5 text-[13px] font-[400] font-manrope-regular">
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M5.33333 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V5.33333" stroke="#AE2020" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M13.9998 5.33333V3.33333C13.9998 2.97971 13.8594 2.64057 13.6093 2.39052C13.3593 2.14048 13.0201 2 12.6665 2H10.6665" stroke="#AE2020" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M2 10.666V12.666C2 13.0196 2.14048 13.3588 2.39052 13.6088C2.64057 13.8589 2.97971 13.9993 3.33333 13.9993H5.33333" stroke="#AE2020" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M10.6665 13.9993H12.6665C13.0201 13.9993 13.3593 13.8589 13.6093 13.6088C13.8594 13.3588 13.9998 13.0196 13.9998 12.666V10.666" stroke="#AE2020" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M5.33333 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V5.33333" stroke="#AE2020" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M13.9998 5.33333V3.33333C13.9998 2.97971 13.8594 2.64057 13.6093 2.39052C13.3593 2.14048 13.0201 2 12.6665 2H10.6665" stroke="#AE2020" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M2 10.666V12.666C2 13.0196 2.14048 13.3588 2.39052 13.6088C2.64057 13.8589 2.97971 13.9993 3.33333 13.9993H5.33333" stroke="#AE2020" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M10.6665 13.9993H12.6665C13.0201 13.9993 13.3593 13.8589 13.6093 13.6088C13.8594 13.3588 13.9998 13.0196 13.9998 12.666V10.666" stroke="#AE2020" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
-                                        {item.area} sq m
+                                        {item.area} {item.areaUnit}
                                     </span>
                                 </div>
 

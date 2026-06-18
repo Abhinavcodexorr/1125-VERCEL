@@ -1,23 +1,87 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+export interface BookingSelection {
+    checkInDate: string;
+    checkOutDate: string;
+    adults: number;
+    children: number;
+    quantity: number;
+}
+
+export interface BookingBoxHandle {
+    getBooking: () => BookingSelection;
+}
+
+interface BookingBoxProps {
+    showQuantity?: boolean;
+    maxQuantity?: number;
+    onSelectionChange?: (selection: BookingSelection) => void;
+}
+
+function startOfDay(date: Date): Date {
+    const value = new Date(date);
+    value.setHours(0, 0, 0, 0);
+    return value;
+}
+
+function addDays(date: Date, days: number): Date {
+    const value = new Date(date);
+    value.setDate(value.getDate() + days);
+    return value;
+}
+
+function formatBookingDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
 // Prop add kiya hai showQuantity taaki sirf Chalets mein dikhe
-export default function BookingBox({ showQuantity = false }: { showQuantity?: boolean }) {
-    const [checkIn, setCheckIn] = useState(new Date());
+const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function BookingBox(
+    { showQuantity = false, maxQuantity, onSelectionChange },
+    ref
+) {
+    const [checkIn, setCheckIn] = useState<Date | null>(null);
+    const [checkOut, setCheckOut] = useState<Date | null>(null);
     const [adults, setAdults] = useState(2);
     const [children, setChildren] = useState(0);
-    const [quantity, setQuantity] = useState(1); // Quantity state
-
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const [checkOut, setCheckOut] = useState(tomorrow);
+    const [quantity, setQuantity] = useState(1);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const today = startOfDay(new Date());
+        setCheckIn(today);
+        setCheckOut(addDays(today, 1));
+    }, []);
+
+    useEffect(() => {
+        if (!checkIn || !checkOut || !onSelectionChange) return;
+
+        onSelectionChange({
+            checkInDate: formatBookingDate(checkIn),
+            checkOutDate: formatBookingDate(checkOut),
+            adults,
+            children,
+            quantity,
+        });
+    }, [checkIn, checkOut, adults, children, quantity, onSelectionChange]);
+
+    useEffect(() => {
+        if (maxQuantity === undefined || maxQuantity < 1) return;
+        if (quantity > maxQuantity) {
+            setQuantity(maxQuantity);
+        }
+    }, [maxQuantity, quantity]);
+
+    const quantityCap =
+        maxQuantity !== undefined && maxQuantity > 0 ? maxQuantity : undefined;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -34,12 +98,19 @@ export default function BookingBox({ showQuantity = false }: { showQuantity?: bo
         };
     }, []);
 
-    const formatDate = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
+    useImperativeHandle(ref, () => ({
+        getBooking: () => ({
+            checkInDate: checkIn ? formatBookingDate(checkIn) : "",
+            checkOutDate: checkOut ? formatBookingDate(checkOut) : "",
+            adults,
+            children,
+            quantity,
+        }),
+    }));
+
+    const checkInLabel = checkIn ? formatBookingDate(checkIn) : "Select date";
+    const checkOutLabel = checkOut ? formatBookingDate(checkOut) : "Select date";
+    const today = startOfDay(new Date());
 
     return (
         <div
@@ -56,24 +127,22 @@ export default function BookingBox({ showQuantity = false }: { showQuantity?: bo
                     onClick={() => setActiveDropdown(activeDropdown === "checkin" ? null : "checkin")}
                     className="w-full flex items-center justify-between text-left font-jako-bold text-[14px] font-[400]"
                 >
-                    <span className="text-[#BC2623] text-[13px] sm:text-[14px]">{formatDate(checkIn)}</span>
+                    <span className="text-[#BC2623] text-[13px] sm:text-[14px]" suppressHydrationWarning>{checkInLabel}</span>
                     <svg className={`w-4 h-4 transition-transform duration-200 ml-2 shrink-0 ${activeDropdown === "checkin" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                     </svg>
                 </button>
 
-                {activeDropdown === "checkin" && (
+                {activeDropdown === "checkin" && checkIn && (
                     <div className="absolute top-full left-0 mt-2 z-[99999] scale-[0.85] md:scale-100 origin-top-left ">
                         <DatePicker
                             selected={checkIn}
-                            minDate={new Date()}
+                            minDate={today}
                             onChange={(date: Date | null) => {
                                 if (date) {
                                     setCheckIn(date);
-                                    if (date >= checkOut) {
-                                        const nextDay = new Date(date);
-                                        nextDay.setDate(nextDay.getDate() + 1);
-                                        setCheckOut(nextDay);
+                                    if (checkOut && date >= checkOut) {
+                                        setCheckOut(addDays(date, 1));
                                     }
                                     setActiveDropdown(null);
                                 }
@@ -93,7 +162,7 @@ export default function BookingBox({ showQuantity = false }: { showQuantity?: bo
                     onClick={() => setActiveDropdown(activeDropdown === "checkout" ? null : "checkout")}
                     className="w-full flex items-center justify-between text-left font-jako-bold text-[14px] font-[400]"
                 >
-                    <span className="text-[#BC2623] text-[13px] sm:text-[14px] ">{formatDate(checkOut)}</span>
+                    <span className="text-[#BC2623] text-[13px] sm:text-[14px]" suppressHydrationWarning>{checkOutLabel}</span>
                     <svg className={`w-4 h-4 transition-transform duration-200 ml-2 shrink-0 ${activeDropdown === "checkout" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                     </svg>
@@ -101,11 +170,11 @@ export default function BookingBox({ showQuantity = false }: { showQuantity?: bo
 
 
 
-                {activeDropdown === "checkout" && (
+                {activeDropdown === "checkout" && checkIn && checkOut && (
                     <div className="absolute top-full left-0 mt-2 z-[99999] scale-[0.85] md:scale-100 origin-top-left shadow-xl bg-white">
                         <DatePicker
                             selected={checkOut}
-                            minDate={new Date()}
+                            minDate={addDays(checkIn, 1)}
                             filterDate={(d) => d > checkIn}
                             onChange={(date: Date | null) => {
                                 if (date) {
@@ -227,6 +296,7 @@ export default function BookingBox({ showQuantity = false }: { showQuantity?: bo
                                     >+</button> */}
                                     <button className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer"
                                         onClick={() => setQuantity(quantity + 1)}
+                                        disabled={quantityCap !== undefined && quantity >= quantityCap}
                                         type="button">
 
                                         <svg width="12" height="12" viewBox="0 0 12 12">
@@ -248,4 +318,6 @@ export default function BookingBox({ showQuantity = false }: { showQuantity?: bo
             )}
         </div>
     );
-}
+});
+
+export default BookingBox;

@@ -43,7 +43,7 @@ return (
       src={image}
       alt={title}
       fill
-      className="object-cover object-center"
+      sizes="(max-width: 640px) 280px, 330px" className="object-cover object-center"
       />
 </div>
 

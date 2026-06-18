@@ -1,10 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { FadeIn,} from "@/lib/components/MotionWrapper";
+import { useState } from "react";
+import { FadeIn } from "@/lib/components/MotionWrapper";
+import PaymentCheckout from "@/lib/components/payment/PaymentCheckout";
 
 export default function PaymentPage() {
+  const [subtitle, setSubtitle] = useState(
+    "Securely finalize your reservation."
+  );
+
   return (
     <main className="min-h-screen bg-[#FFFEF8] font-sans antialiased text-[#444444] pb-16">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-6 md:py-8">
@@ -16,7 +21,7 @@ export default function PaymentPage() {
           <Link href="/" className="flex flex-col shrink-0">
             <div className="w-[120px] sm:w-[120px] md:w-[140px] h-[50px] md:h-[60px] relative">
               <svg width="50" height="52" className="w-full h-full max-w-[145px] max-h-[68px]" viewBox="0 0 56 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_1_2297)">
+                    <g clipPath="url(#clip0_1_2297)">
                       <path d="M1.78624 47.894C1.58075 47.8887 1.42531 47.8861 1.31992 47.8861C1.21981 47.8807 1.12496 47.8781 1.03539 47.8781C0.951083 47.8781 0.866778 47.8807 0.782469 47.8861C0.698165 47.8861 0.582242 47.8887 0.434706 47.894C0.313515 47.8994 0.223939 47.902 0.165979 47.902C0.108018 47.902 0.0526915 47.902 0 47.902V47.6223C0.353034 47.6223 0.566436 47.5823 0.640201 47.5024C0.713971 47.4225 0.756123 47.1828 0.766663 46.7832C0.782469 46.1758 0.790372 45.6989 0.790372 45.3526C0.795644 45.0063 0.798275 44.3084 0.798275 43.2588C0.798275 43.051 0.785105 42.9151 0.758759 42.8512C0.732414 42.7819 0.687625 42.7313 0.624395 42.6993C0.571703 42.678 0.50057 42.6647 0.410995 42.6594C0.321419 42.6487 0.184421 42.6434 0 42.6434V42.3637C0.0421533 42.3637 0.113287 42.3664 0.213401 42.3717C0.313515 42.3717 0.479493 42.3744 0.711335 42.3797C0.869409 42.385 0.974792 42.3877 1.02748 42.3877C1.08018 42.3877 1.11443 42.3877 1.13024 42.3877C1.14604 42.3877 1.1961 42.3877 1.28041 42.3877C1.36471 42.3823 1.53069 42.3797 1.77834 42.3797C2.07342 42.3744 2.27364 42.3717 2.37902 42.3717C2.48441 42.3664 2.55027 42.3637 2.57662 42.3637C3.21419 42.3637 3.68051 42.4622 3.97558 42.6594C4.27066 42.8512 4.41819 43.1575 4.41819 43.5785C4.41819 43.8768 4.29963 44.1432 4.06252 44.3776C3.83068 44.6067 3.51453 44.7719 3.11407 44.8731C3.61464 44.9051 3.99929 45.0436 4.26802 45.2887C4.54202 45.5338 4.67901 45.8641 4.67901 46.2797C4.67901 46.7592 4.47088 47.1508 4.05462 47.4545C3.63835 47.7528 3.07455 47.902 2.36322 47.902C2.30526 47.902 2.23676 47.902 2.15772 47.902C2.07868 47.8967 1.95486 47.894 1.78624 47.894ZM2.34741 42.6754H1.67559C1.5544 42.6754 1.48063 42.71 1.45429 42.7793C1.42794 42.8432 1.41477 43.067 1.41477 43.4506V44.8411H2.33161C2.79002 44.8411 3.13778 44.7479 3.3749 44.5615C3.61201 44.3696 3.73057 44.0899 3.73057 43.7223C3.73057 43.376 3.61464 43.1149 3.3828 42.9391C3.15096 42.7633 2.80583 42.6754 2.34741 42.6754ZM1.35154 47.4705C1.50434 47.4971 1.6914 47.5184 1.9127 47.5344C2.13401 47.5504 2.37112 47.5584 2.62404 47.5584C3.1088 47.5584 3.45657 47.4705 3.66734 47.2946C3.88337 47.1135 3.99139 46.8258 3.99139 46.4315C3.99139 46.0053 3.84122 45.683 3.54087 45.4645C3.24053 45.2461 2.79793 45.1368 2.21305 45.1368H1.41477V46.3596C1.41477 46.626 1.4095 46.8577 1.39896 47.0549C1.38843 47.2467 1.37261 47.3852 1.35154 47.4705Z" fill="#66839C" />
                       <path d="M8.79477 47.9819C8.24676 47.9819 7.8094 47.8114 7.48275 47.4705C7.16131 47.1295 7.00061 46.6899 7.00061 46.1518C7.00061 45.5338 7.21666 44.993 7.6487 44.5295C8.0808 44.0606 8.59714 43.8262 9.19783 43.8262C9.5772 43.8262 9.88286 43.9247 10.1147 44.1219C10.3518 44.319 10.4703 44.5668 10.4703 44.8651C10.4703 45.0569 10.4308 45.2008 10.3518 45.2967C10.278 45.3926 10.1674 45.4405 10.0198 45.4405L7.64081 45.4485C7.63555 45.5125 7.63029 45.5657 7.62497 45.6084C7.62497 45.651 7.62497 45.691 7.62497 45.7283C7.62497 46.2504 7.75673 46.6686 8.02019 46.983C8.28364 47.292 8.6314 47.4465 9.06349 47.4465C9.39014 47.4465 9.66155 47.3799 9.87754 47.2467C10.0989 47.1082 10.3149 46.8711 10.5257 46.5354L10.6521 46.6153C10.5099 47.0362 10.2701 47.3692 9.9329 47.6143C9.60093 47.8594 9.22156 47.9819 8.79477 47.9819ZM9.74321 44.8252C9.74321 44.6227 9.67207 44.4629 9.52979 44.3457C9.39283 44.2284 9.1952 44.1698 8.937 44.1698C8.62613 44.1698 8.35741 44.2658 8.13084 44.4575C7.90953 44.6493 7.75936 44.9104 7.68033 45.2408C8.18614 45.2354 8.54973 45.2301 8.77104 45.2248C8.99235 45.2141 9.18467 45.2008 9.348 45.1848C9.42703 45.1741 9.49028 45.1608 9.53768 45.1448C9.59041 45.1288 9.62992 45.1075 9.65628 45.0809C9.68786 45.0489 9.70895 45.0143 9.71948 44.977C9.73532 44.9344 9.74321 44.8838 9.74321 44.8252Z" fill="#66839C" />
                       <path d="M13.7759 47.9819C13.5018 47.9819 13.2832 47.91 13.1198 47.7662C12.9565 47.6223 12.8749 47.4305 12.8749 47.1908C12.8749 46.8657 13.0144 46.5887 13.2937 46.3596C13.5782 46.1252 14.0209 45.9174 14.6216 45.7363L15.1195 45.5844V45.3766C15.1195 44.9504 15.0589 44.636 14.9377 44.4336C14.8165 44.2311 14.6268 44.1299 14.3686 44.1299C14.121 44.1299 13.9313 44.1938 13.7996 44.3217C13.6731 44.4495 13.6099 44.636 13.6099 44.8811V44.985C13.6099 45.1075 13.5625 45.2114 13.4676 45.2967C13.3728 45.3819 13.2569 45.4246 13.1198 45.4246C13.0303 45.4246 12.9591 45.4006 12.9064 45.3526C12.8538 45.2994 12.8274 45.2274 12.8274 45.1368C12.8274 44.9877 12.8775 44.8278 12.9776 44.6573C13.0777 44.4869 13.2094 44.3377 13.3728 44.2098C13.5203 44.0926 13.681 44.0047 13.8549 43.946C14.0288 43.8821 14.2106 43.8502 14.4002 43.8502C14.8323 43.8502 15.1616 43.9674 15.3882 44.2018C15.6201 44.4309 15.736 44.7586 15.736 45.1848C15.736 45.2541 15.7334 45.3446 15.7281 45.4565C15.7281 45.5684 15.7254 45.7523 15.7202 46.008C15.7096 46.2903 15.7017 46.4955 15.6965 46.6233C15.6965 46.7512 15.6965 46.8577 15.6965 46.943C15.6965 47.1135 15.7228 47.2414 15.7755 47.3266C15.8282 47.4119 15.9072 47.4545 16.0126 47.4545C16.0759 47.4545 16.147 47.4225 16.226 47.3586C16.3103 47.2893 16.4131 47.1775 16.5343 47.0229L16.6686 47.1188C16.4789 47.4119 16.2972 47.6303 16.1233 47.7741C15.9494 47.9127 15.7808 47.9819 15.6175 47.9819C15.4541 47.9819 15.325 47.9127 15.2301 47.7741C15.1406 47.6303 15.0958 47.4332 15.0958 47.1828V47.0069C14.9535 47.3053 14.7612 47.5424 14.5188 47.7182C14.2764 47.894 14.0288 47.9819 13.7759 47.9819ZM13.4834 46.919C13.4834 47.0948 13.5387 47.236 13.6494 47.3426C13.7653 47.4492 13.9234 47.5024 14.1236 47.5024C14.2606 47.5024 14.4055 47.4545 14.5583 47.3586C14.7164 47.2627 14.8955 47.1108 15.0958 46.903C15.1011 46.7592 15.1063 46.578 15.1116 46.3596C15.1168 46.1411 15.1195 45.9467 15.1195 45.7762L14.6848 45.944C14.258 46.1092 13.9497 46.2664 13.76 46.4155C13.5756 46.5647 13.4834 46.7326 13.4834 46.919Z" fill="#66839C" />
@@ -79,141 +84,13 @@ export default function PaymentPage() {
             Complete Your Payment
           </h1>
           <p className="mt-3 text-[16px] sm:text-[16px] font-[400] text-gray-500 max-w-[600px] mx-auto tracking-wide font-jako-bold">
-            Securely finalize your reservation for the 5-Bedroom Beach House.
+            {subtitle}
           </p>
         </div>
         </FadeIn>
 
-        {/* Content Layout Grid */}
         <FadeIn delay={0.3} y={30} key="payment-content">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1440px] mx-auto items-start pt-4 py-6 md:py-8 px-6">
-
-          {/* LEFT SIDE: Order Summary Card */}
-          <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-6 lg:col-span-4 lg:sticky lg:top-6">
-            <h3 className="text-[14px] tracking-[1.5px] uppercase font-[400] text-gray-700 mb-5 font-jako-bold">
-              Order Summary
-            </h3>
-            {/* ... rest of summary card */}
-            <div className="flex gap-4 pb-5">
-              <div className="relative w-[75px] h-[75px] rounded-xl overflow-hidden shrink-0 bg-gray-50">
-                <Image
-                  src="/images/50deabec7df2ce9855d14e5125d8b2a525e84eb8 (1).jpg"
-                  alt="Room"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex flex-col justify-center">
-                <h4 className="text-[16px] font-[400] text-[#2C2422] leading-snug font-jako-bold">5-Bedroom Beach House</h4>
-                <p className="text-[14px] font-[400] text-[#5A4F4D] mt-1 font-jako-regular">May 28 - May 30, 2026</p>
-                <p className="text-[14px] font-[400] text-[#5A4F4D] mt-0.5 font-jako-regular">2 Adults</p>
-              </div>
-            </div>
-            {/* ... pricing rows */}
-             <div className="border-t border-[#D5C2C2] pt-5 space-y-3.5 text-xs ">
-              <div className="flex justify-between">
-                <span className="font-jako-regular font-[400] text-[14px] text-[#2C2422]">GSH 650 x 2 nights</span>
-                <span className="font-[400] text-[14px] text-[#2C2422] font-jako-regular" >GSH 1,300.00</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-jako-regular font-[400] text-[14px] text-[#2C2422]">Taxes & Fees</span>
-                <span className="font-[400] text-[14px] text-[#2C2422] font-jako-regular">GSH 195.00</span>
-              </div>
-            </div>
-            <div className="border-t border-[#D5C2C2] mt-5 pt-5 flex justify-between items-center text-sm font-bold text-[#2C2422]">
-              <span className="text-[18px] font-[400] text-[#2C2422] font-jako-bold">Total</span>
-              <span className="text-[18px] font-[400] text-[#2C2422] font-jako-bold">GSH 1,495.00</span>
-            </div>
-          </div>
-
-          {/* RIGHT SIDE: Payment Form */}
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xl shadow-[#E5D7D7] p-6 sm:p-10 lg:col-span-8">
-            <div className="flex items-center gap-2 text-[#AF2F2C] text-[10px] uppercase font-bold tracking-[2px] mb-6">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-              </svg>
-              <span className="font-jako-bold font-[400] text-[12px]">Secure Checkout</span>
-            </div>
-
-            <h2 className="text-[24px] font-[400] text-[#66839C] font-jako-bold mb-6">Contact Details</h2>
-            {/* Input grid */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]">First Name</label>
-                  <input type="text" placeholder="John" className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-bold" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]">Last Name</label>
-                  <input type="text" placeholder="Kofi" className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-bold" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]">Email Address</label>
-                <input type="email" placeholder="john@example.com" className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-medium" />
-              </div>
-            </div>
-
-            <div className="border-t border-[#D5C2C2] my-8"></div>
-
-            <h2 className="text-2xl text-[#517396] font-jako-bold mb-6">Payment Method</h2>
-            <div className="space-y-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]">Card Number</label>
-                <div className="relative flex items-center">
-                  <input type="text" placeholder="0000 0000 0000 0000" className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all w-full pl-10 text-[16px] font-[400] text-[#2C242280] font-jako-medium" />
-                  <span className="absolute left-4 text-[#8C7A7A] text-sm">
-                    {/* FIXED SVG ATTRIBUTES */}
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clipPath="url(#clip0_1_3914)">
-                        <path d="M16.667 4.16699H3.33366C2.41318 4.16699 1.66699 4.91318 1.66699 5.83366V14.167C1.66699 15.0875 2.41318 15.8337 3.33366 15.8337H16.667C17.5875 15.8337 18.3337 15.0875 18.3337 14.167V5.83366C18.3337 4.91318 17.5875 4.16699 16.667 4.16699Z" stroke="#8C7A7A" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M1.66699 8.33301H18.3337" stroke="#8C7A7A" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_1_3914">
-                          <rect width="20" height="20" fill="white" />
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]">Expiry Date</label>
-                  <input type="text" placeholder="MM/YY" className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] w-full transition-all font-jako-medium" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]">CVC</label>
-                  <input type="text" placeholder="123" className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] w-full transition-all font-jako-medium" />
-                </div>
-              </div>
-            </div>
-
-            <button className="w-full mt-8 bg-[#AF2F2C] cursor-pointer hover:bg-[#8e2523] text-white  py-4 rounded-full text-[20px] font-[400] tracking-wider uppercase transition-all duration-200 shadow-sm font-jako-bold">
-              Pay GSH 1,495.00
-            </button>
-
-            <p className="text-center text-[12px]  text-gray-400 mt-5 tracking-wide font-jako-bold flex items-center justify-center gap-1 font-[400]">
-              <span>
-                {/* FIXED SVG ATTRIBUTES */}
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g clipPath="url(#clip0_1_3929)">
-                    <path d="M9.5 5.5H2.5C1.94772 5.5 1.5 5.94772 1.5 6.5V10C1.5 10.5523 1.94772 11 2.5 11H9.5C10.0523 11 10.5 10.5523 10.5 10V6.5C10.5 5.94772 10.0523 5.5 9.5 5.5Z" stroke="#8C7A7A" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M3.5 5.5V3.5C3.5 2.83696 3.76339 2.20107 4.23223 1.73223C4.70107 1.26339 5.33696 1 6 1C6.66304 1 7.29893 1.26339 7.76777 1.73223C8.23661 2.20107 8.5 2.83696 8.5 3.5V5.5" stroke="#8C7A7A" strokeLinecap="round" strokeLinejoin="round" />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_1_3929">
-                      <rect width="12" height="12" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </span> 
-              Payments are secure and encrypted.
-            </p>
-          </div>
-        </div>
+          <PaymentCheckout onSubtitleChange={setSubtitle} />
         </FadeIn>
       </div>
     </main>

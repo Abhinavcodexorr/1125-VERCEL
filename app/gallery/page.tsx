@@ -55,6 +55,7 @@ export default function GalleryPage() {
                         alt="Gallery"
                         fill
                         priority
+                        sizes="calc(100vw - 2rem)"
                         className="object-cover object-bottom"
                     />
                     <div className="absolute inset-0 bg-[#00000033]" />
@@ -140,6 +141,7 @@ export default function GalleryPage() {
                                 src={image.src}
                                 alt={`Gallery ${image.id}`}
                                 fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 className="object-cover transition duration-700 ease-in-out group-hover:scale-110"
                             />
                         </motion.div>

@@ -64,7 +64,8 @@ export default function WhyBookSection() {
                 alt="Why Book With Us"
                 fill
                 priority
-                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 600px"
+              className="object-cover"
               />
             </motion.div>
 

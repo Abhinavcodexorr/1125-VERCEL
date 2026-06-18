@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { motion, Variants } from "framer-motion"; // Variants import kiya
@@ -45,7 +45,18 @@ export default function Hero() {
       router.push("/accommodations/5-bedroom-beach-house");
    };
 
-   const [date, setDate] = useState<Date | null>(new Date());
+   const [date, setDate] = useState<Date | null>(null);
+
+   useEffect(() => {
+      setDate(new Date());
+   }, []);
+
+   const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+   };
 
    const handleDateChange = (d: Date | null) => {
       setDate(d);
@@ -68,7 +79,7 @@ export default function Hero() {
                      alt="Beach Villa"
                      fill
                      priority
-                     sizes="100vw"
+                     sizes="(max-width: 768px) 100vw, 0px"
                      className="object-cover object-center"
                   />
                </motion.div>
@@ -144,7 +155,7 @@ export default function Hero() {
                                     type="button"
                                     className="w-full bg-transparent outline-none text-[#425a70] text-[14px] font-semibold text-left select-none"
                                  >
-                                    {date ? date.toLocaleDateString('en-CA') : "Select Date"}
+                                    {date ? formatDate(date) : "Select Date"}
                                  </button>
                               }
                            />
@@ -180,7 +191,7 @@ export default function Hero() {
                   alt="Beach Villa Panoramic View"
                   fill
                   priority
-                  sizes="100vw"
+                  sizes="(max-width: 768px) 100vw, 1200px"
                   className="object-cover object-center"
                />
                <div className="absolute inset-0 bg-black/10" />
@@ -256,7 +267,7 @@ export default function Hero() {
                                     type="button"
                                     className="w-full h-[54px] bg-transparent outline-none text-[#425a70] text-[14px] font-[700] font-manrope-regular text-left select-none"
                                  >
-                                    {date ? date.toLocaleDateString('en-CA') : "Select Date"}
+                                    {date ? formatDate(date) : "Select Date"}
                                  </button>
                               }
                            />
