@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { getApiBaseUrl } from "./config";
+import { fetchBackend } from "./fetchBackend";
 import { accommodations } from "@/lib/data/accommodations";
 import type { TourItem } from "@/lib/data/tours";
 
@@ -136,6 +137,40 @@ export interface RoomPageData {
   amenities: RoomAmenity[];
 }
 
+function getLocalTitle(slug: string): string | undefined {
+  const localSlug = LEGACY_SLUG_MAP[slug] ?? slug;
+  return accommodations.find((item) => item.slug === localSlug)?.title;
+}
+
+export function getRoomDisplayTitle(room: Room): string {
+  return room.title?.trim() || getLocalTitle(room.slug) || "";
+}
+
+export interface AccommodationTab {
+  slug: string;
+  label: string;
+}
+
+/** List API can return title text in `name`; detail API has the correct short `name`. */
+export async function buildAccommodationTabs(
+  rooms: Room[],
+  currentRoom?: Room | null
+): Promise<AccommodationTab[]> {
+  return Promise.all(
+    rooms.map(async (item) => {
+      const source =
+        currentRoom?.slug === item.slug
+          ? currentRoom
+          : await fetchRoomBySlug(item.slug);
+
+      return {
+        slug: item.slug,
+        label: source?.name?.trim() || item.slug,
+      };
+    })
+  );
+}
+
 export function mapRoomToPageData(room: Room): RoomPageData {
   const sortedImages = [...room.images].sort((a, b) => a.order - b.order);
   const galleryImages = sortedImages.map((img) => img.url);
@@ -144,7 +179,7 @@ export function mapRoomToPageData(room: Room): RoomPageData {
 
   return {
     slug: room.slug,
-    title: room.title,
+    title: getRoomDisplayTitle(room),
     description: room.description,
     price: room.price,
     currencySymbol: room.currencySymbol,
@@ -186,7 +221,7 @@ const fetchRoomBySlugCached = cache(
 
     const qs = params.toString();
     const url = `${getApiBaseUrl()}/api/v1/rooms/${encodeURIComponent(apiSlug)}${qs ? `?${qs}` : ""}`;
-    const response = await fetch(url, { next: { revalidate: 60 } });
+    const response = await fetchBackend(url, { next: { revalidate: 60 } });
 
     if (response.status === 404) return null;
     if (!response.ok) {
@@ -240,7 +275,7 @@ export async function fetchRoomAvailability(
 
   const qs = params.toString();
   const url = `${getApiBaseUrl()}/api/v1/rooms/${encodeURIComponent(apiSlug)}${qs ? `?${qs}` : ""}`;
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchBackend(url, { cache: "no-store" });
 
   if (response.status === 404) return null;
   if (!response.ok) {
@@ -295,7 +330,7 @@ export function mapRoomToAccommodationListing(room: Room): AccommodationListing 
     slug: room.slug,
     category: room.slug === "the-villa" ? "villa" : "room",
     subtitle: room.name.toUpperCase(),
-    title: room.title,
+    title: getRoomDisplayTitle(room),
     price: room.price,
     formattedPrice: room.formattedPrice,
     guests: room.guests,
@@ -340,7 +375,7 @@ export async function fetchRooms(): Promise<Room[]> {
 }
 
 const fetchRoomsCached = cache(async (): Promise<Room[]> => {
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/rooms`, {
+  const response = await fetchBackend(`${getApiBaseUrl()}/api/v1/rooms`, {
     next: { revalidate: 60 },
   });
 

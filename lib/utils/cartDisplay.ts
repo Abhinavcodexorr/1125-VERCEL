@@ -23,12 +23,17 @@ export function getCartItemImage(item: CartItem): string {
 }
 
 export function getCartItemImageAlt(item: CartItem): string {
+  const { title, slug } = item.roomSnapshot;
   const images = item.roomSnapshot.images;
   if (images?.length) {
     const sorted = [...images].sort((a, b) => a.order - b.order);
-    return sorted[0].alt || item.roomSnapshot.title;
+    const alt = sorted[0].alt?.trim();
+    if (alt) return alt;
   }
-  return item.roomSnapshot.title;
+  const roomTitle = title?.trim();
+  if (roomTitle) return roomTitle;
+  if (slug?.trim()) return slug.replace(/-/g, " ");
+  return "Room photo";
 }
 
 export function formatCartDateRange(checkIn: string, checkOut: string): string {

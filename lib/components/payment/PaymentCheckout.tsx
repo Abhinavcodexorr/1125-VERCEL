@@ -19,6 +19,7 @@ import {
   getItemLineTotal,
   getPrimaryRoomTitle,
 } from "@/lib/utils/cartDisplay";
+import { isRemoteImage } from "@/lib/utils/image";
 
 function OrderSummarySkeleton() {
   return (
@@ -102,6 +103,7 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
                 fill
                 sizes="75px"
                 className="object-cover"
+                unoptimized={isRemoteImage(getCartItemImage(item))}
               />
             </div>
             <div className="flex flex-col justify-center min-w-0">

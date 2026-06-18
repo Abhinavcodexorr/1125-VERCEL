@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from "./config";
+import { fetchBackend } from "./fetchBackend";
 
 export interface GuestDetails {
   firstName: string;
@@ -166,7 +167,7 @@ export async function createBooking(
   payload: CreateBookingPayload
 ): Promise<CreateBookingResponse> {
   const baseUrl = getApiBaseUrl();
-  const response = await fetch(`${baseUrl}/api/v1/booking/create`, {
+  const response = await fetchBackend(`${baseUrl}/api/v1/booking/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(buildBookingBody(payload)),

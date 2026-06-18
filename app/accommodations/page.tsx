@@ -10,6 +10,7 @@ import {
   type AccommodationListing,
 } from "@/lib/api/rooms";
 import { accommodations as staticAccommodations } from "@/lib/data/accommodations";
+import { isRemoteImage, resolveImageAlt } from "@/lib/utils/image";
 
 // Animation Variants (TypeScript safe)
 const fadeInUp: Variants = {
@@ -231,10 +232,11 @@ export default function AccommodationsPage() {
                             <div className="relative h-[280px] md:h-[420px] rounded-2xl overflow-hidden bg-gray-100">
                                 <Image
                                     src={item.image}
-                                    alt={item.title}
+                                    alt={resolveImageAlt(item.title, item.subtitle)}
                                     fill
                                     sizes="(max-width: 1024px) calc(100vw - 3rem), min(720px, 50vw)"
                                     className="object-cover"
+                                    unoptimized={isRemoteImage(item.image)}
                                 />
                             </div>
 

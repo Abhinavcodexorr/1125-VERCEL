@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { isRemoteImage, resolveImageAlt } from "@/lib/utils/image";
 
 interface RoomImageGalleryProps {
   image: string;
@@ -20,6 +21,7 @@ export default function RoomImageGallery({
 }: RoomImageGalleryProps) {
   const thumbnails = galleryImages.slice(1, 4);
   const showGalleryOverlay = galleryImages.length > 4;
+  const imageAlt = resolveImageAlt(title, "Accommodation photo");
 
   return (
     <>
@@ -33,11 +35,12 @@ export default function RoomImageGallery({
         <div className="relative h-[360px] md:h-[440px]">
           <Image
             src={image}
-            alt={title}
+            alt={imageAlt}
             fill
             sizes="(max-width: 1024px) calc(100vw - 3rem), 480px"
             className="object-cover"
             priority
+            unoptimized={isRemoteImage(image)}
           />
         </div>
       </div>
@@ -54,12 +57,13 @@ export default function RoomImageGallery({
                   src={thumbUrl}
                   alt={
                     showOverlay
-                      ? `${title} gallery`
-                      : `${title} photo ${index + 2}`
+                      ? `${imageAlt} gallery`
+                      : `${imageAlt} photo ${index + 2}`
                   }
                   fill
                   sizes="(max-width: 1024px) 30vw, 150px"
                   className="object-cover"
+                  unoptimized={isRemoteImage(thumbUrl)}
                 />
                 {showOverlay && (
                   <div className="absolute inset-0 bg-black/60 group-hover:bg-black/75 flex items-center justify-center transition-colors duration-200">

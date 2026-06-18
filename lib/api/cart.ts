@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from "./config";
+import { fetchBackend } from "./fetchBackend";
 
 export interface AddToCartPayload {
   roomId: string;
@@ -104,7 +105,7 @@ export async function addToCart(
   payload: AddToCartPayload
 ): Promise<AddToCartResponse> {
   const baseUrl = getApiBaseUrl();
-  const response = await fetch(`${baseUrl}/api/v1/cart`, {
+  const response = await fetchBackend(`${baseUrl}/api/v1/cart`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -150,7 +151,7 @@ export async function addToCartClient(
 
 export async function getCart(cartId: string): Promise<GetCartResponse> {
   const baseUrl = getApiBaseUrl();
-  const response = await fetch(
+  const response = await fetchBackend(
     `${baseUrl}/api/v1/cart/${encodeURIComponent(cartId)}`,
     { cache: "no-store" }
   );

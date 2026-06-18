@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
         pathname: "/rooms/**",
       },
     ],
+    minimumCacheTTL: 86400,
   },
 };
 

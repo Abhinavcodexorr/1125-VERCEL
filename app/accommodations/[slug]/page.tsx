@@ -9,6 +9,8 @@ import { FadeIn, StaggerItem, SectionFade } from "@/lib/components/MotionWrapper
 import {
     fetchRoomBySlug,
     fetchRooms,
+    buildAccommodationTabs,
+    getRoomDisplayTitle,
     mapRoomToPageData,
 } from "@/lib/api/rooms";
 
@@ -45,14 +47,12 @@ export default async function AccommodationDetailPage({
     if (!apiRoom) notFound();
 
     const room = mapRoomToPageData(apiRoom);
+    const displayTitle = getRoomDisplayTitle(apiRoom);
     const availabilityUnit = room.slug === "chalets" ? "Chalet" : "Unit";
 
-    const tabs: { slug: string; label: string }[] = allRooms.length
-        ? allRooms.map((item) => ({
-              slug: item.slug,
-              label: item.name,
-          }))
-        : [{ slug: room.slug, label: apiRoom.name }];
+    const tabs = allRooms.length
+        ? await buildAccommodationTabs(allRooms, apiRoom)
+        : [{ slug: room.slug, label: apiRoom.name?.trim() || room.slug }];
 
     return (
         <main className="bg-[#FFFEF8] min-h-screen">
@@ -91,7 +91,7 @@ export default async function AccommodationDetailPage({
                                     scroll={false}
                                     href={`/accommodations/${tab.slug}`}
                                     className={`
-                                px-3 sm:px-7 py-4 lg:text-[16px] text-[12px] tracking-wider uppercase font-[400] 
+                                px-3 sm:px-7 py-4 lg:text-[16px] text-[12px] tracking-wider font-[400] 
                                 rounded-xl sm:rounded-b-none sm:rounded-t-xl shrink-0 transition-all duration-150 
                                 font-jeko-black w-full sm:w-auto text-center flex items-center justify-center
                                 ${isActive
@@ -119,7 +119,7 @@ export default async function AccommodationDetailPage({
                             <RoomImageGallery
                                 image={room.image}
                                 galleryImages={room.galleryImages}
-                                title={room.title}
+                                title={displayTitle}
                                 currencySymbol={room.currencySymbol}
                                 price={room.price}
                             />
@@ -129,7 +129,7 @@ export default async function AccommodationDetailPage({
                         <div className="w-full lg:col-span-7 flex flex-col justify-between min-h-[440px] pt-2">
                             <div>
                                 <h2 className="font-ogg-regular text-[#7CA5C8] text-[38px] font-[500] lg:text-[38px] leading-tight ">
-                                    {room.title || "The Villa"}
+                                    {displayTitle}
                                 </h2>
                                 <p className="mt-4 text-[#242424] text-[16px] font-[400] leading-relaxed max-w-[540px] font-jako-regular">
                                     {room.description || "Experience a sanctuary..."}
@@ -166,7 +166,7 @@ export default async function AccommodationDetailPage({
                                     scroll={false}
                                     href={`/accommodations/${tab.slug}`}
                                     className={`
-                                px-3 sm:px-7 py-4 sm:pt-5 sm:pb-4 lg:text-[16px] text-[12px] tracking-wider uppercase font-[400] 
+                                px-3 sm:px-7 py-4 sm:pt-5 sm:pb-4 lg:text-[16px] text-[12px] tracking-wider font-[400] 
                                 rounded-xl sm:rounded-b-none sm:rounded-t-xl shrink-0 transition-all duration-150 
                                 font-jeko-black w-full sm:w-auto text-center flex items-center justify-center
                                 ${isActive
@@ -195,7 +195,7 @@ export default async function AccommodationDetailPage({
                                 <RoomImageGallery
                                     image={room.image}
                                     galleryImages={room.galleryImages}
-                                    title={room.title}
+                                    title={displayTitle}
                                     currencySymbol={room.currencySymbol}
                                     price={room.price}
                                 />
@@ -205,7 +205,7 @@ export default async function AccommodationDetailPage({
                             <div className="w-full lg:col-span-7 flex flex-col justify-between min-h-[440px] pt-2">
                                 <div>
                                     <h2 className="font-ogg-regular text-[#7CA5C8] text-[38px] font-[500] lg:text-[38px] leading-tight ">
-                                        {room.title || "The Villa"}
+                                        {displayTitle}
                                     </h2>
 
                                     <p className="mt-4 text-[#242424] text-[16px] font-[400] leading-relaxed max-w-[540px] font-jako-regular">
