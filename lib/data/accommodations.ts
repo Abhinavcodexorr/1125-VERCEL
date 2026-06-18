@@ -56,16 +56,16 @@ export const accommodations = [
   },
   {
     id: 4,
-    slug: "chalets", // <-- यहाँ सही स्लग कर दिया
+    slug: "chalets", 
     category: "room",
     subtitle: "EXCLUSIVE COASTAL CHALETS",
-    title: "Chalets", // <-- यहाँ सही नाम कर दिया
+    title: "Chalets", 
     price: 250,
     guests: 2,
     area: 45,
     image: "/images/accommodations/50deabec7df2ce9855d14e5125d8b2a525e84eb8 (1).jpg",
     description:
-      "Comfortable and thoughtfully designed chalets near the beach.",
+      "Intimate and secluded. Our five identical oceanfront chalets offer a private retreat with uninterrupted views of the Atlantic, perfect for couples or solo travelers seeking tactile luxury.",
     features: [
       "Queen Bed",
       "Air Conditioning",

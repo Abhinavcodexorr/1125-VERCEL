@@ -10,7 +10,7 @@ export interface TourItem {
 export const tours: TourItem[] = [
   {
     id: 1,
-    image: "/images/hero.jpg",
+    image: "/images/b553da9d39aaf4186d3f57e3f82ed60f4c45a3f0.jpg",
     title: "Oceanfront Deck",
     feature: "Ocean View",
     labelType: "Capacity",
@@ -18,7 +18,7 @@ export const tours: TourItem[] = [
   },
   {
     id: 2,
-    image: "/images/hero.jpg",
+    image: "/images/91b428e900ee79b561738fbbfb9a4e11b59e4411.jpg",
     title: "Swim-Up Pool Chalets",
     feature: "Private Terrace, Direct Swim-Up Pool Access",
     labelType: "Units",
@@ -26,7 +26,7 @@ export const tours: TourItem[] = [
   },
   {
     id: 3,
-    image: "/images/hero.jpg",
+    image: "/images/7a361a3c8514b960f5f200f9a2102e517c94bc4e.jpg",
     title: "The Villa",
     feature: "Private Ocean-Facing Pool, Open-Plan Living",
     labelType: "Occupancy",

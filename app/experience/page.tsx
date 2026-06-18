@@ -59,7 +59,7 @@ export default function EventsPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="font-serif text-white text-[45px] md:text-[65px] font-[400] font-ogg-regular text-center tracking-wide leading-none"
+              className="font-serif text-white text-[45px] capitalize md:text-[65px] font-[400] font-ogg-regular text-center tracking-wide leading-none"
             >
               Host your most unforgettable <br />event
             </motion.h1>

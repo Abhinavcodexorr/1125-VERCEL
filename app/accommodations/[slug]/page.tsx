@@ -11,6 +11,7 @@ import {
     fetchRooms,
     buildAccommodationTabs,
     getRoomDisplayTitle,
+    getRoomDisplayType,
     mapRoomToPageData,
 } from "@/lib/api/rooms";
 
@@ -47,12 +48,12 @@ export default async function AccommodationDetailPage({
     if (!apiRoom) notFound();
 
     const room = mapRoomToPageData(apiRoom);
-    const displayTitle = getRoomDisplayTitle(apiRoom);
+    const displayType = getRoomDisplayType(apiRoom);
     const availabilityUnit = room.slug === "chalets" ? "Chalet" : "Unit";
 
     const tabs = allRooms.length
         ? buildAccommodationTabs(allRooms, apiRoom)
-        : [{ slug: room.slug, label: apiRoom.name?.trim() || room.slug }];
+        : [{ slug: room.slug, label: getRoomDisplayTitle(apiRoom) || room.slug }];
 
     return (
         <main className="bg-[#FFFEF8] min-h-screen">
@@ -119,7 +120,7 @@ export default async function AccommodationDetailPage({
                             <RoomImageGallery
                                 image={room.image}
                                 galleryImages={room.galleryImages}
-                                title={displayTitle}
+                                title={displayType}
                                 currencySymbol={room.currencySymbol}
                                 price={room.price}
                             />
@@ -129,7 +130,7 @@ export default async function AccommodationDetailPage({
                         <div className="w-full lg:col-span-7 flex flex-col justify-between min-h-[440px] pt-2">
                             <div>
                                 <h2 className="font-ogg-regular text-[#7CA5C8] text-[38px] font-[500] lg:text-[38px] leading-tight ">
-                                    {displayTitle}
+                                    {displayType}
                                 </h2>
                                 <p className="mt-4 text-[#242424] text-[16px] font-[400] leading-relaxed max-w-[540px] font-jako-regular">
                                     {room.description || "Experience a sanctuary..."}
@@ -196,7 +197,7 @@ export default async function AccommodationDetailPage({
                                 <RoomImageGallery
                                     image={room.image}
                                     galleryImages={room.galleryImages}
-                                    title={displayTitle}
+                                    title={displayType}
                                     currencySymbol={room.currencySymbol}
                                     price={room.price}
                                 />
@@ -206,7 +207,7 @@ export default async function AccommodationDetailPage({
                             <div className="w-full lg:col-span-7 flex flex-col justify-between min-h-[440px] pt-2">
                                 <div>
                                     <h2 className="font-ogg-regular text-[#7CA5C8] text-[38px] font-[500] lg:text-[38px] leading-tight ">
-                                        {displayTitle}
+                                        {displayType}
                                     </h2>
 
                                     <p className="mt-4 text-[#242424] text-[16px] font-[400] leading-relaxed max-w-[540px] font-jako-regular">

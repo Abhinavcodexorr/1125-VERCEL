@@ -23,9 +23,6 @@ const fadeInUp: Variants = {
 export default function AccommodationsPageClient() {
   const [listings, setListings] = useState<AccommodationListing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
-  const [priceOpen, setPriceOpen] = useState(false);
-  const [occupancyOpen, setOccupancyOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,10 +44,7 @@ export default function AccommodationsPageClient() {
     };
   }, []);
 
-  const filtered =
-    filter === "all"
-      ? listings
-      : listings.filter((item) => item.category === filter);
+  const filtered = listings;
 
   return (
     <main className="bg-[#FFFEF8] min-h-screen font-sans antialiased text-[#444444] overflow-x-hidden">
@@ -77,136 +71,15 @@ export default function AccommodationsPageClient() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="font-serif text-white text-[45px] md:text-[65px] font-[400] font-ogg-regular text-center tracking-wide leading-none"
+              className="font-serif capitalize text-white text-[45px] md:text-[65px] font-[400] font-ogg-regular text-center tracking-wide leading-none"
             >
-              Host your most unforgettable <br />
-              event
+              Find your perfect <br />
+              escape
             </motion.h1>
           </div>
         </motion.div>
       </section>
 
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="max-w-[1440px] mx-auto px-6 md:px-10 lg:px-12 pt-10 pb-2"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/60 pb-6">
-          <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold tracking-widest text-[#7c828c]">
-            <div className="flex items-center gap-2 pr-2 uppercase text-[#5c626d]">
-              <svg
-                className="w-4 h-4 text-[#8A7E74]"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                />
-              </svg>
-              <span className="font-manrope-regular font-[700] text-[11px]">
-                Filter
-              </span>
-            </div>
-
-            <div className="relative">
-              <button
-                onClick={() => setPriceOpen(!priceOpen)}
-                className="flex items-center justify-between gap-6 px-5 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 transition-colors uppercase cursor-pointer"
-              >
-                <span className="font-manrope-regular font-[700] text-[11px]">
-                  Any Price
-                </span>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  className={`transition-transform ${priceOpen ? "rotate-180" : ""}`}
-                >
-                  <path
-                    d="M3.5 5.25L7 8.75L10.5 5.25"
-                    stroke="#242424"
-                    strokeWidth="1.16667"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {priceOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute top-full mt-2 left-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50"
-                >
-                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50">
-                    ₹5,000+
-                  </button>
-                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50">
-                    ₹10,000+
-                  </button>
-                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50">
-                    ₹20,000+
-                  </button>
-                </motion.div>
-              )}
-            </div>
-
-            <div className="relative">
-              <button
-                onClick={() => setOccupancyOpen(!occupancyOpen)}
-                className="flex items-center justify-between gap-6 px-5 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 transition-colors uppercase cursor-pointer"
-              >
-                <span className="font-manrope-regular font-[700] text-[11px]">
-                  Occupancy
-                </span>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  className={`transition-transform ${occupancyOpen ? "rotate-180" : ""}`}
-                >
-                  <path
-                    d="M3.5 5.25L7 8.75L10.5 5.25"
-                    stroke="#242424"
-                    strokeWidth="1.16667"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {occupancyOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute top-full mt-2 left-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50"
-                >
-                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50">
-                    1-2 Guests
-                  </button>
-                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50">
-                    3-4 Guests
-                  </button>
-                  <button className="w-full text-left px-4 py-3 hover:bg-gray-50">
-                    5+ Guests
-                  </button>
-                </motion.div>
-              )}
-            </div>
-          </div>
-
-          <div className="text-[12px] font-[400] font-light text-[#8a929d] tracking-normal italic font-manrope-regular sm:text-right">
-            {filtered.length} {filtered.length === 1 ? "sanctuary" : "sanctuaries"}
-          </div>
-        </div>
-      </motion.section>
 
       <section className="max-w-[1440px] mx-auto px-6 md:px-10 lg:px-12 py-10">
         {isLoading ? (
@@ -233,7 +106,7 @@ export default function AccommodationsPageClient() {
               <div className="relative h-[280px] md:h-[420px] rounded-2xl overflow-hidden bg-gray-100">
                 <Image
                   src={item.image}
-                  alt={resolveImageAlt(item.title, item.subtitle)}
+                  alt={resolveImageAlt(item.title, item.type)}
                   fill
                   sizes="(max-width: 1024px) calc(100vw - 3rem), min(720px, 50vw)"
                   className="object-cover"
@@ -243,7 +116,7 @@ export default function AccommodationsPageClient() {
 
               <div>
                 <p className="uppercase tracking-[2px] text-[#AE2020] text-[11px] font-[400] font-jako-bold">
-                  {item.subtitle || "Sanctuary Escape"}
+                  {item.type || "Sanctuary Escape"}
                 </p>
 
                 <h2 className="mt-3 text-[32.13px] font-[400] font-ogg-regular text-[#7CA5C8]">
@@ -257,7 +130,7 @@ export default function AccommodationsPageClient() {
                 <p className="mt-6 text-[#6B6B6B] text-[15px] font-[400] leading-relaxed max-w-[520px] font-light font-manrope-regular">
                   {item.description}
                 </p>
-
+                <div className="border-t border-[#66839C1F] my-6"></div>
                 <div className="flex flex-wrap gap-8 mt-6 text-[#8B8B8B] text-xs font-light tracking-wide">
                   <span className="flex items-center gap-1.5 text-[13px] font-[400] font-manrope-regular">
                     <svg
@@ -322,7 +195,7 @@ export default function AccommodationsPageClient() {
                   </span>
                 </div>
 
-                <div className="border-t border-gray-200/60 my-6"></div>
+                <div className="border-t border-[#66839C1F] my-6"></div>
 
                 <div className="flex flex-wrap gap-2 mb-8">
                   {item.features.map((feature: string) => (

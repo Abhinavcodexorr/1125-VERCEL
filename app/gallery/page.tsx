@@ -11,9 +11,12 @@ const galleryImages = [
     { id: 5, src: "/images/gallery/5.jpg", height: "h-[212px]" },
     { id: 6, src: "/images/gallery/6.jpg", height: "h-[239px]" },
     { id: 7, src: "/images/gallery/7.jpg", height: "h-[477px]" },
-    { id: 8, src: "/images/gallery/8.jpg", height: "h-[477px]" },
-    { id: 9, src: "/images/gallery/9.jpg", height: "h-[212px]" },
-    { id: 10, src: "/images/gallery/10.jpg", height: "h-[477px]" },
+    { id: 8, src: "/images/gallery/5.jpg", height: "h-[212px]" },
+    { id: 9, src: "/images/gallery/8.jpg", height: "h-[477px]" },
+    // { id: 10, src: "/images/gallery/9.jpg", height: "h-[212px]" },   
+    { id: 11, src: "/images/gallery/10.jpg", height: "h-[477px]" },
+     { id: 12, src: "/images/gallery/10.jpg", height: "h-[477px]" },
+       { id: 13, src: "/images/gallery/10.jpg", height: "h-[477px]" },
 ];
 
 const categories = [
@@ -142,7 +145,7 @@ export default function GalleryPage() {
                                 alt={`Gallery ${image.id}`}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                className="object-cover transition duration-700 ease-in-out group-hover:scale-110"
+                                className="object-cover transition duration-700 ease-in-out"
                             />
                         </motion.div>
                     ))}

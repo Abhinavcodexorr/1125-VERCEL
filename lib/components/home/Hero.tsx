@@ -144,6 +144,7 @@ export default function Hero() {
                               onChange={handleDateChange}
                               placeholderText="Select Date"
                               dateFormat="yyyy-MM-dd"
+                              className="cursor-pointer"
                               filterDate={(d) => {
                                  const today = new Date();
                                  today.setHours(0, 0, 0, 0);
@@ -246,16 +247,18 @@ export default function Hero() {
                      animate="visible"
                      variants={fadeInUp}
                      transition={{ delay: 1.2 }}
+                     
                      onSubmit={handleSubmit} 
-                     className="mt-12 w-[680px] h-[62px] rounded-[51px] bg-white p-[4px] shadow-xl"
+                     className="mt-12 w-[680px] h-[62px] rounded-[51px] cursor-pointer bg-white p-[4px] shadow-xl"
                   >
                      <div className="flex items-center justify-between h-full">
-                        <div className="flex-1 pl-8">
+                        <div className="flex-1 pl-8 cursor-pointer">
                            <DatePicker
                               selected={date}
                               onChange={handleDateChange}
                               placeholderText="Select Date"
                               dateFormat="yyyy-MM-dd"
+                              className="cursor-pointer"
                               filterDate={(d) => {
                                  const today = new Date();
                                  today.setHours(0, 0, 0, 0);

@@ -60,10 +60,11 @@ export default function ContactPage() {
             viewport={{ once: true }}
             className="w-full lg:flex-1 px-6 md:px-12 lg:pl-[7%] xl:pl-[7%] mb-16 lg:mb-0"
           >
-            <motion.h2 variants={fadeInUp} className="font-ogg-regular text-[80px] lg:text-[110px] font-[400] leading-[0.85] text-[#222]">
+            <motion.h2 variants={fadeInUp} className="font-ogg-regular text-[80px] mt-6 lg:text-[110px] font-[400] leading-[0.85] text-[#222]">
               Get in
             </motion.h2>
-            <motion.h2 variants={fadeInUp} className="font-ogg-regular text-[80px] lg:text-[110px] font-[400] leading-[0.85] text-[#9BB9DA]">
+            <motion.h2 variants={fadeInUp} className="font-ogg-regular text-[80px] mt-5 lg:text-[110px] font-[400] leading-[0.85] text-[#9BB9DA]">
+            
               Touch
             </motion.h2>
 
@@ -94,13 +95,13 @@ export default function ContactPage() {
           </motion.div>
 
           {/* RIGHT SIDE - Exact Figma Specs: 480x600 & Sticking to Right Edge */}
-          <div className="w-full md:w-[80px] lg:w-[600px] ml-auto mt-16">
+          <div className="w-full md:w-[80px] lg:w-[600px] ml-auto mt-28">
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="relative w-full h-[500px] lg:h-[600px] bg-gray-100" 
+              className="relative w-full h-[500px] lg:h-[600px]  bg-gray-100" 
             >
               <Image
                 src="/images/contact-room.jpg"

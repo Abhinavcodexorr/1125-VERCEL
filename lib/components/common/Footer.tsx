@@ -4,14 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 
 const exploreLinks = [
-  { name: "Sanctuaries", href: "#" },
-  { name: "Experience", href: "#" },
-  { name: "Our Story", href: "#" },
+  { name: "Gallery", href: "/gallery" },
+  { name: "Experience", href: "/experience" },
+  { name: "Our Story", href: "/our-story" },
 ];
 
 const supportLinks = [
   { name: "FAQ", href: "#" },
-  { name: "Contact Us", href: "#" },
+  { name: "Contact Us", href: "/contact" },
   { name: "Privacy Policy", href: "#" },
   { name: "Terms of Use", href: "#" },
   { name: "Refund Policy", href: "#" },

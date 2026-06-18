@@ -90,7 +90,7 @@ export default function NewsletterSection() {
                 <input
                   type="email"
                   placeholder="Email Address"
-                  className="font-jako-bold flex-1 bg-transparent outline-none text-[20px] md:text-[15px] lg:text-[20px] placeholder:text-[#66839C]/70 text-[#425a70] font-medium font-jake-bold text-[400] opacity-100"
+                  className="font-jako-bold flex-1 bg-transparent outline-none text-[20px] md:text-[15px] lg:text-[20px] placeholder:text-[#66839C]/70 text-[#1a242d] font-[400] font-jake-bold text-[400] opacity-100"
                 />
                 <button
                   type="submit"

@@ -33,6 +33,7 @@ export interface Room {
   _id: string;
   name: string;
   title: string;
+  type: string;
   slug: string;
   description: string;
   size: number;
@@ -143,7 +144,11 @@ function getLocalTitle(slug: string): string | undefined {
 }
 
 export function getRoomDisplayTitle(room: Room): string {
-  return room.title?.trim() || getLocalTitle(room.slug) || "";
+  return room.title?.trim() || room.name?.trim() || getLocalTitle(room.slug) || "";
+}
+
+export function getRoomDisplayType(room: Room): string {
+  return room.type?.trim() || "";
 }
 
 export interface AccommodationTab {
@@ -151,7 +156,7 @@ export interface AccommodationTab {
   label: string;
 }
 
-/** Tabs use `name`; requires enriched room list from fetchRooms(). */
+/** Detail page tabs use `title`. */
 export function buildAccommodationTabs(
   rooms: Room[],
   currentRoom?: Room | null
@@ -160,7 +165,7 @@ export function buildAccommodationTabs(
     const source = currentRoom?.slug === item.slug ? currentRoom : item;
     return {
       slug: item.slug,
-      label: source.name?.trim() || item.slug,
+      label: getRoomDisplayTitle(source),
     };
   });
 }
@@ -304,7 +309,9 @@ export interface AccommodationListing {
   id: string;
   slug: string;
   category: "villa" | "room";
-  subtitle: string;
+  /** Room type shown first in red. */
+  type: string;
+  /** Room title shown as the large blue heading. */
   title: string;
   price: number;
   formattedPrice: string;
@@ -323,8 +330,8 @@ export function mapRoomToAccommodationListing(room: Room): AccommodationListing 
     id: room._id,
     slug: room.slug,
     category: room.slug === "the-villa" ? "villa" : "room",
-    subtitle: room.name?.trim() || "",
-    title: room.title?.trim() || "",
+    type: room.type?.trim() || "",
+    title: room.title?.trim() || room.name?.trim() || "",
     price: room.price,
     formattedPrice: room.formattedPrice,
     guests: room.guests,

@@ -190,6 +190,7 @@ export default function TourSection() {
             Make A Reservation
           </Link>
         </motion.div>
+
       </div>
     </section>
   );
