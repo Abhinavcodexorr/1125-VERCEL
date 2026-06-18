@@ -16,6 +16,18 @@ export interface RoomImage {
   order: number;
 }
 
+export interface RoomAvailability {
+  isAvailable: boolean;
+  quantity: number;
+  availableUnits: number;
+  bookedUnits: number;
+  requestedQuantity: number;
+  showQuantityPicker: boolean;
+  maxSelectableQuantity: number;
+  nights: number;
+  subTotal: number;
+}
+
 export interface Room {
   _id: string;
   name: string;
@@ -30,6 +42,7 @@ export interface Room {
   currencySymbol: string;
   formattedPrice: string;
   guests: number;
+  /** Total units in the property (inventory cap). */
   quantity: number;
   adultCapacity: number;
   childCapacity: number;
@@ -37,6 +50,7 @@ export interface Room {
   images: RoomImage[];
   isActive: boolean;
   isDeleted: boolean;
+  availability?: RoomAvailability;
 }
 
 export interface RoomsResponse {
@@ -60,6 +74,16 @@ const LEGACY_SLUG_MAP: Record<string, string> = {
 
 export function resolveApiSlug(urlSlug: string): string {
   return LEGACY_SLUG_MAP[urlSlug] ?? urlSlug;
+}
+
+const OBJECT_ID_REGEX = /^[a-f\d]{24}$/i;
+
+/** Use MongoDB _id as-is; only map legacy URL slugs. */
+export function resolveRoomIdOrSlug(idOrSlug: string): string {
+  if (OBJECT_ID_REGEX.test(idOrSlug)) {
+    return idOrSlug;
+  }
+  return resolveApiSlug(idOrSlug);
 }
 
 export function getAccommodationHref(slug: string): string {
@@ -152,7 +176,7 @@ export async function fetchRoomBySlug(
 
 const fetchRoomBySlugCached = cache(
   async (idOrSlug: string, query?: RoomDetailQuery): Promise<Room | null> => {
-    const apiSlug = resolveApiSlug(idOrSlug);
+    const apiSlug = resolveRoomIdOrSlug(idOrSlug);
     const params = new URLSearchParams();
 
     if (query?.checkInDate) params.set("checkInDate", query.checkInDate);
@@ -178,7 +202,7 @@ export async function fetchRoomBySlugClient(
   idOrSlug: string,
   query?: RoomDetailQuery
 ): Promise<Room | null> {
-  const apiSlug = resolveApiSlug(idOrSlug);
+  const apiSlug = resolveRoomIdOrSlug(idOrSlug);
   const params = new URLSearchParams();
 
   if (query?.checkInDate) params.set("checkInDate", query.checkInDate);
@@ -206,7 +230,7 @@ export async function fetchRoomAvailability(
   idOrSlug: string,
   query: RoomDetailQuery
 ): Promise<Room | null> {
-  const apiSlug = resolveApiSlug(idOrSlug);
+  const apiSlug = resolveRoomIdOrSlug(idOrSlug);
   const params = new URLSearchParams();
 
   if (query.checkInDate) params.set("checkInDate", query.checkInDate);
@@ -228,18 +252,23 @@ export async function fetchRoomAvailability(
 }
 
 export function formatAvailabilityLabel(
-  count: number,
+  availableUnits: number,
   unitSingular = "Chalet"
 ): string {
   const unitPlural = unitSingular.endsWith("s")
     ? unitSingular
     : `${unitSingular}s`;
 
-  if (count <= 0) {
+  if (availableUnits <= 0) {
     return `No ${unitPlural} Available`;
   }
 
-  return `${count} ${count === 1 ? unitSingular : unitPlural} Available`;
+  return `${availableUnits} ${availableUnits === 1 ? unitSingular : unitPlural} Available`;
+}
+
+export function parseRoomAvailability(room: Room | null): RoomAvailability | null {
+  if (!room?.availability) return null;
+  return room.availability;
 }
 
 export interface AccommodationListing {

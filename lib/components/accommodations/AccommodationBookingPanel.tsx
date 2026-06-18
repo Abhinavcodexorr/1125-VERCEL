@@ -9,13 +9,13 @@ import CompleteReservationButton from "@/lib/components/accommodations/CompleteR
 import {
   fetchRoomBySlugClient,
   formatAvailabilityLabel,
+  type RoomAvailability,
 } from "@/lib/api/rooms";
 
 interface AccommodationBookingPanelProps {
   roomId: string;
-  roomSlug: string;
-  showQuantity: boolean;
-  initialQuantity: number;
+  /** Total units in the property (`room.quantity` inventory cap). */
+  totalUnits: number;
   availabilityUnit?: string;
 }
 
@@ -56,16 +56,17 @@ function AvailabilityBadge({
 
 function AccommodationBookingPanelInner({
   roomId,
-  roomSlug,
-  showQuantity,
-  initialQuantity,
+  totalUnits,
   availabilityUnit = "Chalet",
 }: AccommodationBookingPanelProps) {
   const bookingRef = useRef<BookingBoxHandle>(null);
   const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
+  const showQuantityPickerRef = useRef(totalUnits > 1);
 
-  const [availableQuantity, setAvailableQuantity] = useState(initialQuantity);
+  const [availability, setAvailability] = useState<RoomAvailability | null>(
+    null
+  );
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
 
   const refreshAvailability = useCallback(
@@ -80,20 +81,27 @@ function AccommodationBookingPanelInner({
         const requestId = ++requestIdRef.current;
         setIsLoadingAvailability(true);
 
+        const includeQuantity = showQuantityPickerRef.current;
+
         try {
-          const room = await fetchRoomBySlugClient(roomSlug, {
+          const room = await fetchRoomBySlugClient(roomId, {
             checkInDate: selection.checkInDate,
             checkOutDate: selection.checkOutDate,
             adults: selection.adults,
-            ...(showQuantity ? { quantity: selection.quantity } : {}),
+            ...(includeQuantity ? { quantity: selection.quantity } : {}),
           });
 
           if (requestId !== requestIdRef.current) return;
 
-          setAvailableQuantity(room?.quantity ?? 0);
+          if (room?.availability) {
+            setAvailability(room.availability);
+            showQuantityPickerRef.current = room.availability.showQuantityPicker;
+          } else {
+            setAvailability(null);
+          }
         } catch {
           if (requestId !== requestIdRef.current) return;
-          setAvailableQuantity(0);
+          setAvailability(null);
         } finally {
           if (requestId === requestIdRef.current) {
             setIsLoadingAvailability(false);
@@ -101,7 +109,7 @@ function AccommodationBookingPanelInner({
         }
       }, 350);
     },
-    [roomSlug, showQuantity]
+    [roomId]
   );
 
   useEffect(() => {
@@ -112,36 +120,49 @@ function AccommodationBookingPanelInner({
     };
   }, []);
 
+  const showQuantityPicker = availability
+    ? availability.showQuantityPicker
+    : totalUnits > 1;
+  const showAvailabilityBadge = showQuantityPicker;
+
+  const availableUnits = availability?.availableUnits ?? 0;
+  const isAvailable = availability?.isAvailable ?? false;
+  const maxSelectableQuantity = availability?.maxSelectableQuantity ?? 0;
+
   const availabilityLabel = formatAvailabilityLabel(
-    availableQuantity,
+    availableUnits,
     availabilityUnit
   );
-  const isAvailable = availableQuantity > 0;
-  const maxQuantity = showQuantity
-    ? Math.max(availableQuantity, 0)
-    : undefined;
+
+  const maxQuantity =
+    showQuantityPicker && maxSelectableQuantity > 0
+      ? maxSelectableQuantity
+      : undefined;
+
+  const canReserve =
+    Boolean(availability?.isAvailable) && !isLoadingAvailability;
 
   return (
     <>
-      {showQuantity && (
+      {showAvailabilityBadge && (
         <AvailabilityBadge
           label={availabilityLabel}
-          isLoading={isLoadingAvailability}
+          isLoading={isLoadingAvailability || !availability}
           isAvailable={isAvailable}
         />
       )}
 
       <BookingBox
         ref={bookingRef}
-        showQuantity={showQuantity}
+        showQuantity={showQuantityPicker}
         maxQuantity={maxQuantity}
         onSelectionChange={refreshAvailability}
       />
 
       <CompleteReservationButton
         roomId={roomId}
-        showQuantity={showQuantity}
-        disabled={!isAvailable || isLoadingAvailability}
+        showQuantity={showQuantityPicker}
+        disabled={!canReserve}
         getBooking={() =>
           bookingRef.current?.getBooking() ?? {
             checkInDate: "",
@@ -178,7 +199,9 @@ export default function AccommodationBookingPanel(
   props: AccommodationBookingPanelProps
 ) {
   return (
-    <Suspense fallback={<BookingBoxSkeleton showQuantity={props.showQuantity} />}>
+    <Suspense
+      fallback={<BookingBoxSkeleton showQuantity={props.totalUnits > 1} />}
+    >
       <AccommodationBookingPanelInner {...props} />
     </Suspense>
   );

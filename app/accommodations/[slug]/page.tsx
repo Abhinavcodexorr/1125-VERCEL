@@ -45,7 +45,6 @@ export default async function AccommodationDetailPage({
     if (!apiRoom) notFound();
 
     const room = mapRoomToPageData(apiRoom);
-    const showQuantity = room.slug === "chalets" || room.quantity > 1;
     const availabilityUnit = room.slug === "chalets" ? "Chalet" : "Unit";
 
     const tabs: { slug: string; label: string }[] = allRooms.length
@@ -143,9 +142,7 @@ export default async function AccommodationDetailPage({
                             <div className="w-full max-w-[600px] bg-[#FFFEF8] border border-[#E7DDD4] rounded-[12px] p-[24px] mt-10">
                                 <AccommodationBookingPanel
                                     roomId={apiRoom._id}
-                                    roomSlug={room.slug}
-                                    showQuantity={showQuantity}
-                                    initialQuantity={room.quantity}
+                                    totalUnits={room.quantity}
                                     availabilityUnit={availabilityUnit}
                                 />
                             </div>
@@ -222,9 +219,7 @@ export default async function AccommodationDetailPage({
                                 <div className="w-full max-w-[600px] min-h-[188px] bg-[#FFFEF8] border border-[#E7DDD4] rounded-[12px] p-[24px] mt-10">
                                     <AccommodationBookingPanel
                                         roomId={apiRoom._id}
-                                        roomSlug={room.slug}
-                                        showQuantity={showQuantity}
-                                        initialQuantity={room.quantity}
+                                        totalUnits={room.quantity}
                                         availabilityUnit={availabilityUnit}
                                     />
                                 </div>
