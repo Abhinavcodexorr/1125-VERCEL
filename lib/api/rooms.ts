@@ -151,24 +151,18 @@ export interface AccommodationTab {
   label: string;
 }
 
-/** List API can return title text in `name`; detail API has the correct short `name`. */
-export async function buildAccommodationTabs(
+/** Tabs use `name`; requires enriched room list from fetchRooms(). */
+export function buildAccommodationTabs(
   rooms: Room[],
   currentRoom?: Room | null
-): Promise<AccommodationTab[]> {
-  return Promise.all(
-    rooms.map(async (item) => {
-      const source =
-        currentRoom?.slug === item.slug
-          ? currentRoom
-          : await fetchRoomBySlug(item.slug);
-
-      return {
-        slug: item.slug,
-        label: source?.name?.trim() || item.slug,
-      };
-    })
-  );
+): AccommodationTab[] {
+  return rooms.map((item) => {
+    const source = currentRoom?.slug === item.slug ? currentRoom : item;
+    return {
+      slug: item.slug,
+      label: source.name?.trim() || item.slug,
+    };
+  });
 }
 
 export function mapRoomToPageData(room: Room): RoomPageData {
@@ -329,17 +323,14 @@ export function mapRoomToAccommodationListing(room: Room): AccommodationListing 
     id: room._id,
     slug: room.slug,
     category: room.slug === "the-villa" ? "villa" : "room",
-    subtitle: room.name.toUpperCase(),
-    title: getRoomDisplayTitle(room),
+    subtitle: room.name?.trim() || "",
+    title: room.title?.trim() || "",
     price: room.price,
     formattedPrice: room.formattedPrice,
     guests: room.guests,
     area: room.size,
     areaUnit: room.unit,
-    image:
-      sortedImages[0]?.url ??
-      getLocalImage(room.slug) ??
-      "/images/hero.jpg",
+    image: sortedImages[0]?.url ?? "",
     description: room.description,
     features: room.amenities.map((amenity) => amenity.name),
   };
@@ -370,6 +361,18 @@ async function parseRoomsResponse(response: Response): Promise<Room[]> {
   return json.data.filter((room) => room.isActive && !room.isDeleted);
 }
 
+/** List endpoint swaps `name`/`title`; merge each room with its detail record. */
+async function enrichRoomsWithDetailData(rooms: Room[]): Promise<Room[]> {
+  if (!rooms.length) return rooms;
+
+  return Promise.all(
+    rooms.map(async (room) => {
+      const detail = await fetchRoomBySlug(room.slug);
+      return detail ?? room;
+    })
+  );
+}
+
 export async function fetchRooms(): Promise<Room[]> {
   return fetchRoomsCached();
 }
@@ -379,10 +382,12 @@ const fetchRoomsCached = cache(async (): Promise<Room[]> => {
     next: { revalidate: 60 },
   });
 
-  return parseRoomsResponse(response);
+  const rooms = await parseRoomsResponse(response);
+  return enrichRoomsWithDetailData(rooms);
 });
 
 let roomsClientCache: { data: Room[]; expiresAt: number } | null = null;
+let roomsClientInflight: Promise<Room[]> | null = null;
 const ROOMS_CLIENT_CACHE_MS = 60_000;
 
 export async function fetchRoomsClient(): Promise<Room[]> {
@@ -390,11 +395,25 @@ export async function fetchRoomsClient(): Promise<Room[]> {
     return roomsClientCache.data;
   }
 
-  const response = await fetch("/api/rooms");
+  if (roomsClientInflight) {
+    return roomsClientInflight;
+  }
 
-  const data = await parseRoomsResponse(response);
-  roomsClientCache = { data, expiresAt: Date.now() + ROOMS_CLIENT_CACHE_MS };
-  return data;
+  roomsClientInflight = (async () => {
+    try {
+      const response = await fetch("/api/rooms");
+      const data = await parseRoomsResponse(response);
+      roomsClientCache = {
+        data,
+        expiresAt: Date.now() + ROOMS_CLIENT_CACHE_MS,
+      };
+      return data;
+    } finally {
+      roomsClientInflight = null;
+    }
+  })();
+
+  return roomsClientInflight;
 }
 
 export async function fetchTourListings(): Promise<TourListingItem[]> {

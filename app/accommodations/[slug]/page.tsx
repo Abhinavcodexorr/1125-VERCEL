@@ -51,7 +51,7 @@ export default async function AccommodationDetailPage({
     const availabilityUnit = room.slug === "chalets" ? "Chalet" : "Unit";
 
     const tabs = allRooms.length
-        ? await buildAccommodationTabs(allRooms, apiRoom)
+        ? buildAccommodationTabs(allRooms, apiRoom)
         : [{ slug: room.slug, label: apiRoom.name?.trim() || room.slug }];
 
     return (
@@ -144,6 +144,7 @@ export default async function AccommodationDetailPage({
                                     roomId={apiRoom._id}
                                     totalUnits={room.quantity}
                                     availabilityUnit={availabilityUnit}
+                                    checkAvailability={room.slug === "chalets"}
                                 />
                             </div>
                         </div>
@@ -221,6 +222,7 @@ export default async function AccommodationDetailPage({
                                         roomId={apiRoom._id}
                                         totalUnits={room.quantity}
                                         availabilityUnit={availabilityUnit}
+                                        checkAvailability={room.slug === "chalets"}
                                     />
                                 </div>
 

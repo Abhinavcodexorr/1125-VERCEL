@@ -17,6 +17,8 @@ interface AccommodationBookingPanelProps {
   /** Total units in the property (`room.quantity` inventory cap). */
   totalUnits: number;
   availabilityUnit?: string;
+  /** Live check-in/check-out availability — chalets only. */
+  checkAvailability?: boolean;
 }
 
 function AvailabilityBadge({
@@ -58,6 +60,7 @@ function AccommodationBookingPanelInner({
   roomId,
   totalUnits,
   availabilityUnit = "Chalet",
+  checkAvailability = false,
 }: AccommodationBookingPanelProps) {
   const bookingRef = useRef<BookingBoxHandle>(null);
   const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,6 +74,7 @@ function AccommodationBookingPanelInner({
 
   const refreshAvailability = useCallback(
     (selection: BookingSelection) => {
+      if (!checkAvailability) return;
       if (!selection.checkInDate || !selection.checkOutDate) return;
 
       if (fetchTimerRef.current) {
@@ -109,7 +113,7 @@ function AccommodationBookingPanelInner({
         }
       }, 350);
     },
-    [roomId]
+    [checkAvailability, roomId]
   );
 
   useEffect(() => {
@@ -120,10 +124,13 @@ function AccommodationBookingPanelInner({
     };
   }, []);
 
-  const showQuantityPicker = availability
-    ? availability.showQuantityPicker
-    : totalUnits > 1;
-  const showAvailabilityBadge = showQuantityPicker;
+  const showQuantityPicker = checkAvailability
+    ? availability
+      ? availability.showQuantityPicker
+      : totalUnits > 1
+    : false;
+
+  const showAvailabilityBadge = checkAvailability && showQuantityPicker;
 
   const availableUnits = availability?.availableUnits ?? 0;
   const isAvailable = availability?.isAvailable ?? false;
@@ -135,12 +142,13 @@ function AccommodationBookingPanelInner({
   );
 
   const maxQuantity =
-    showQuantityPicker && maxSelectableQuantity > 0
+    checkAvailability && showQuantityPicker && maxSelectableQuantity > 0
       ? maxSelectableQuantity
       : undefined;
 
-  const canReserve =
-    Boolean(availability?.isAvailable) && !isLoadingAvailability;
+  const canReserve = checkAvailability
+    ? Boolean(availability?.isAvailable) && !isLoadingAvailability
+    : true;
 
   return (
     <>
