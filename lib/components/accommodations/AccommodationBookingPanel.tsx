@@ -89,11 +89,12 @@ function AccommodationBookingPanelInner({
   useEffect(() => {
     if (!cartId) return;
 
+    const activeCartId = cartId;
     let cancelled = false;
 
     async function loadCartSelection() {
       try {
-        const result = await getCartClient(cartId);
+        const result = await getCartClient(activeCartId);
         if (cancelled) return;
 
         if (result.success && result.data) {
