@@ -50,9 +50,8 @@ export default function GalleryPage() {
             const hash = window.location.hash.replace("#", "");
             if (categories.some((category) => category.slug === hash)) {
                 setActiveCategory(hash);
-                requestAnimationFrame(() => {
-                    document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
-                });
+            } else if (!hash) {
+                setActiveCategory("all");
             }
         };
 

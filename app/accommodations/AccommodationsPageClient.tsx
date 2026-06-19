@@ -9,7 +9,7 @@ import {
   mapRoomsToAccommodationListings,
   type AccommodationListing,
 } from "@/lib/api/rooms";
-import { isRemoteImage, resolveImageAlt } from "@/lib/utils/image";
+import { isNextImageOptimizable, resolveImageAlt } from "@/lib/utils/image";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -110,7 +110,9 @@ export default function AccommodationsPageClient() {
                   fill
                   sizes="(max-width: 1024px) calc(100vw - 3rem), min(720px, 50vw)"
                   className="object-cover"
-                  unoptimized={isRemoteImage(item.image)}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  quality={80}
+                  unoptimized={!isNextImageOptimizable(item.image)}
                 />
               </div>
 

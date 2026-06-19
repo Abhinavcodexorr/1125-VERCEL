@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { isRemoteImage, resolveImageAlt } from "@/lib/utils/image";
+import {
+  isNextImageOptimizable,
+  resolveImageAlt,
+} from "@/lib/utils/image";
 
 interface RoomImageGalleryProps {
   image: string;
@@ -22,6 +25,7 @@ export default function RoomImageGallery({
   const thumbnails = galleryImages.slice(1, 4);
   const showGalleryOverlay = galleryImages.length > 4;
   const imageAlt = resolveImageAlt(title, "Accommodation photo");
+  const mainImageOptimizable = isNextImageOptimizable(image);
 
   return (
     <>
@@ -40,7 +44,9 @@ export default function RoomImageGallery({
             sizes="(max-width: 1024px) calc(100vw - 3rem), 480px"
             className="object-cover"
             priority
-            unoptimized={isRemoteImage(image)}
+            fetchPriority="high"
+            quality={80}
+            unoptimized={!mainImageOptimizable}
           />
         </div>
       </div>
@@ -50,6 +56,7 @@ export default function RoomImageGallery({
           {thumbnails.map((thumbUrl, index) => {
             const isLast = index === thumbnails.length - 1;
             const showOverlay = isLast && showGalleryOverlay;
+            const thumbOptimizable = isNextImageOptimizable(thumbUrl);
 
             const content = (
               <>
@@ -63,7 +70,9 @@ export default function RoomImageGallery({
                   fill
                   sizes="(max-width: 1024px) 30vw, 150px"
                   className="object-cover"
-                  unoptimized={isRemoteImage(thumbUrl)}
+                  loading="lazy"
+                  quality={70}
+                  unoptimized={!thumbOptimizable}
                 />
                 {showOverlay && (
                   <div className="absolute inset-0 bg-black/60 group-hover:bg-black/75 flex items-center justify-center transition-colors duration-200">
@@ -80,7 +89,7 @@ export default function RoomImageGallery({
                 <Link
                   key={`${index}-${thumbUrl}`}
                   href={galleryHref}
-                  className="relative w-full h-[85px] rounded-xl overflow-hidden cursor-pointer group transition block"
+                  className="relative w-full h-[85px] rounded-xl overflow-hidden cursor-pointer group transition block bg-[#f9f8f6]"
                 >
                   {content}
                 </Link>
@@ -90,7 +99,7 @@ export default function RoomImageGallery({
             return (
               <div
                 key={`${index}-${thumbUrl}`}
-                className="relative w-full h-[85px] rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition"
+                className="relative w-full h-[85px] rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition bg-[#f9f8f6]"
               >
                 {content}
               </div>

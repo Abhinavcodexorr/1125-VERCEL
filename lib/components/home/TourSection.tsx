@@ -142,7 +142,7 @@ export default function TourSection() {
                     <div className="flex justify-between items-start gap-3 pt-5 px-1">
                       <h3 className="font-ogg-regular text-white text-[22px] lg:text-[24px] leading-[1.15] font-[500] tracking-wide capitalize pr-2">{tour.title}</h3>
                       <Link
-                        href={`/gallery#${tour.gallerySection}`}
+                        href="/gallery"
                         aria-label={`View ${tour.title} in gallery`}
                         className="w-[31px] h-[31px] rounded-full bg-[#AE2020] hover:bg-[#AE2020] flex items-center justify-center shrink-0 transition-colors mt-0.5 shadow-sm cursor-pointer"
                       >
