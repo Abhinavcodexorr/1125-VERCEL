@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion"; // 1. Import Framer Motion
+import { motion } from "framer-motion";
 
 const galleryImages = [   
     { id: 1, src: "/images/gallery/1.jpg", height: "h-[282px]" },
@@ -20,12 +21,11 @@ const galleryImages = [
 ];
 
 const categories = [
-    "All",
-    "Outdoor / Pergola",
-    "Deck & Events",
-    "Experiences",
-    "Interiors",
-    "Pool & Beach",
+    { label: "All", slug: "all" },
+    { label: "Outdoor / Pergola", slug: "outdoor-pergola" },
+    { label: "Deck & Events", slug: "deck-events" },
+    { label: "Interiors", slug: "interiors" },
+    { label: "Pool & Beach", slug: "pool-beach" },
 ];
 
 // Animation Variants
@@ -43,6 +43,24 @@ const staggerContainer = {
 };
 
 export default function GalleryPage() {
+    const [activeCategory, setActiveCategory] = useState("all");
+
+    useEffect(() => {
+        const applyHash = () => {
+            const hash = window.location.hash.replace("#", "");
+            if (categories.some((category) => category.slug === hash)) {
+                setActiveCategory(hash);
+                requestAnimationFrame(() => {
+                    document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
+                });
+            }
+        };
+
+        applyHash();
+        window.addEventListener("hashchange", applyHash);
+        return () => window.removeEventListener("hashchange", applyHash);
+    }, []);
+
     return (
         <main className="bg-[#FFFEF8] min-h-screen">
             {/* Hero Section */}
@@ -93,9 +111,14 @@ export default function GalleryPage() {
                         }}
                     >
                         <div className="flex w-max gap-3 py-5">
-                            {categories.map((item, index) => (
+                            {categories.map((category) => (
                                 <button
-                                    key={item}
+                                    key={category.slug}
+                                    type="button"
+                                    onClick={() => {
+                                        setActiveCategory(category.slug);
+                                        window.history.replaceState(null, "", `#${category.slug}`);
+                                    }}
                                     className={`
                                         whitespace-nowrap 
                                         px-6 
@@ -110,13 +133,13 @@ export default function GalleryPage() {
                                         tracking-[0.4px]          
                                         transition-all 
                                         duration-200
-                                        ${index === 0
+                                        ${activeCategory === category.slug
                                             ? "bg-white text-[#66839C]"
                                             : "text-[#FFFEF8B2] hover:bg-white/10 hover:text-white"
                                         }
                                     `}
                                 >
-                                    {item}
+                                    {category.label}
                                 </button>
                             ))}
                             <div className="w-4 md:hidden" />
@@ -126,7 +149,7 @@ export default function GalleryPage() {
             </motion.section>
 
             {/* Gallery Grid */}
-            <section className="max-w-[1400px] mx-auto px-6 py-8  md:px-10 lg:px-12 ">
+            <section id="gallery" className="max-w-[1400px] mx-auto px-6 py-8  md:px-10 lg:px-12 ">
                 <motion.div 
                     variants={staggerContainer}
                     initial="hidden"

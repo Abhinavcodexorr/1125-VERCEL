@@ -9,6 +9,7 @@ export default function PaymentPage() {
   const [subtitle, setSubtitle] = useState(
     "Securely finalize your reservation."
   );
+  const [backHref, setBackHref] = useState("/accommodations");
 
   return (
     <main className="min-h-screen bg-[#FFFEF8] font-sans antialiased text-[#444444] pb-16">
@@ -70,7 +71,7 @@ export default function PaymentPage() {
           </Link>
 
           <Link
-            href="/accommodations"
+            href={backHref}
             className="text-[16px] font-[400] tracking-wide text-gray-800 hover:text-[#b92d2b] transition-colors flex items-center gap-1 font-jako-bold pr-4"
           >
             ‹ Go Back
@@ -90,7 +91,10 @@ export default function PaymentPage() {
         </FadeIn>
 
         <FadeIn delay={0.3} y={30} key="payment-content">
-          <PaymentCheckout onSubtitleChange={setSubtitle} />
+          <PaymentCheckout
+            onSubtitleChange={setSubtitle}
+            onBackHrefChange={setBackHref}
+          />
         </FadeIn>
       </div>
     </main>

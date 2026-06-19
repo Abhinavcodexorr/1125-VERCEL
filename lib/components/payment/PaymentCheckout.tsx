@@ -8,7 +8,8 @@ import { getCartClient, type CartData } from "@/lib/api/cart";
 import {
   COUNTRY_CODE_OPTIONS,
   createBookingClient,
-  validateGuestDetails,
+  validateGuestDetailsFields,
+  type GuestFieldErrors,
 } from "@/lib/api/booking";
 import {
   formatCartDateRange,
@@ -18,6 +19,7 @@ import {
   getCartItemImageAlt,
   getItemLineTotal,
   getPrimaryRoomTitle,
+  getPrimaryRoomDetailHref,
 } from "@/lib/utils/cartDisplay";
 import { isRemoteImage } from "@/lib/utils/image";
 
@@ -155,8 +157,10 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
 
 function PaymentCheckoutInner({
   onSubtitleChange,
+  onBackHrefChange,
 }: {
   onSubtitleChange: (subtitle: string) => void;
+  onBackHrefChange: (href: string) => void;
 }) {
   const searchParams = useSearchParams();
   const cartId = searchParams.get("cartId");
@@ -171,6 +175,21 @@ function PaymentCheckoutInner({
   const [mobileNumber, setMobileNumber] = useState("");
   const [countryCode, setCountryCode] = useState("233");
   const [specialRequests, setSpecialRequests] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<GuestFieldErrors>({});
+
+  const clearFieldError = (field: keyof GuestFieldErrors) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const inputBorderClass = (hasError: boolean) =>
+    hasError
+      ? "border-[#BC2623] focus:border-[#BC2623]"
+      : "border-[#E5D7D7] focus:border-gray-400";
 
   useEffect(() => {
     let cancelled = false;
@@ -182,6 +201,7 @@ function PaymentCheckoutInner({
         setCart(null);
         setIsLoading(false);
         onSubtitleChange("Securely finalize your reservation.");
+        onBackHrefChange("/accommodations");
         return;
       }
 
@@ -200,10 +220,12 @@ function PaymentCheckoutInner({
           setCartError(message);
           setCart(null);
           onSubtitleChange("Securely finalize your reservation.");
+          onBackHrefChange("/accommodations");
           return;
         }
 
         setCart(result.data);
+        onBackHrefChange(getPrimaryRoomDetailHref(result.data));
         onSubtitleChange(
           `Securely finalize your reservation for ${getPrimaryRoomTitle(result.data)}.`
         );
@@ -212,6 +234,7 @@ function PaymentCheckoutInner({
         setCartError("Failed to retrieve cart");
         setCart(null);
         onSubtitleChange("Securely finalize your reservation.");
+        onBackHrefChange("/accommodations");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -222,7 +245,7 @@ function PaymentCheckoutInner({
     return () => {
       cancelled = true;
     };
-  }, [cartId, onSubtitleChange]);
+  }, [cartId, onSubtitleChange, onBackHrefChange]);
 
   const handleCreateBooking = async () => {
     setBookingError(null);
@@ -232,17 +255,18 @@ function PaymentCheckoutInner({
       return;
     }
 
-    const guestValidation = validateGuestDetails({
+    const guestValidation = validateGuestDetailsFields({
       firstName,
       lastName,
       email,
       mobileNumber,
       countryCode,
     });
-    if (guestValidation) {
-      setBookingError(guestValidation);
+    if (Object.keys(guestValidation).length > 0) {
+      setFieldErrors(guestValidation);
       return;
     }
+    setFieldErrors({});
 
     if (!cart?.allAvailable || !cart.items.every((item) => item.isAvailable)) {
       setBookingError(
@@ -342,17 +366,27 @@ function PaymentCheckoutInner({
                 htmlFor="guest-first-name"
                 className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
               >
-                First Name
+                First Name <span className="text-[#BC2623]">*</span>
               </label>
               <input
                 id="guest-first-name"
                 type="text"
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                  clearFieldError("firstName");
+                }}
                 placeholder="John"
                 autoComplete="given-name"
-                className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-bold"
+                aria-invalid={Boolean(fieldErrors.firstName)}
+                aria-describedby={fieldErrors.firstName ? "guest-first-name-error" : undefined}
+                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-bold ${inputBorderClass(Boolean(fieldErrors.firstName))}`}
               />
+              {fieldErrors.firstName && (
+                <p id="guest-first-name-error" role="alert" className="text-[12px] text-[#BC2623] font-jako-medium">
+                  {fieldErrors.firstName}
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <label
@@ -373,53 +407,78 @@ function PaymentCheckoutInner({
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="guest-email"
-              className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
-            >
-              Email Address
-            </label>
-            <input
-              id="guest-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="john@example.com"
-              autoComplete="email"
-              className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-medium"
-            />
+              <label
+                htmlFor="guest-email"
+                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
+              >
+                Email Address <span className="text-[#BC2623]">*</span>
+              </label>
+              <input
+                id="guest-email"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  clearFieldError("email");
+                }}
+                placeholder="john@example.com"
+                autoComplete="email"
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? "guest-email-error" : undefined}
+                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-medium ${inputBorderClass(Boolean(fieldErrors.email))}`}
+              />
+              {fieldErrors.email && (
+                <p id="guest-email-error" role="alert" className="text-[12px] text-[#BC2623] font-jako-medium">
+                  {fieldErrors.email}
+                </p>
+              )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="guest-mobile"
-              className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
-            >
-              Mobile Number
-            </label>
-            <div className="flex rounded-xl border border-[#E5D7D7] focus-within:border-gray-400 bg-[#FFFEF8] transition-all overflow-hidden">
-              <select
-                id="guest-country-code"
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                aria-label="Country code"
-                className="border-0 border-r border-[#E5D7D7] outline-none rounded-none px-3 py-3 text-[14px] font-[400] text-[#2C242280] bg-transparent transition-all font-jako-medium shrink-0 min-w-[110px]"
+              <label
+                htmlFor="guest-mobile"
+                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
               >
-                {COUNTRY_CODE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <input
-                id="guest-mobile"
-                type="tel"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                placeholder="241234567"
-                autoComplete="tel-national"
-                className="border-0 outline-none rounded-none px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-transparent transition-all font-jako-medium flex-1 min-w-0"
-              />
-            </div>
+                Mobile Number <span className="text-[#BC2623]">*</span>
+              </label>
+              <div
+                className={`flex rounded-xl border bg-[#FFFEF8] transition-all overflow-hidden ${inputBorderClass(Boolean(fieldErrors.mobileNumber))} ${fieldErrors.mobileNumber ? "focus-within:border-[#BC2623]" : "focus-within:border-gray-400"}`}
+              >
+                <select
+                  id="guest-country-code"
+                  value={countryCode}
+                  onChange={(e) => {
+                    setCountryCode(e.target.value);
+                    clearFieldError("mobileNumber");
+                  }}
+                  aria-label="Country code"
+                  className="border-0 border-r border-[#E5D7D7] outline-none rounded-none px-3 py-3 text-[14px] font-[400] text-[#2C242280] bg-transparent transition-all font-jako-medium shrink-0 min-w-[110px]"
+                >
+                  {COUNTRY_CODE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  id="guest-mobile"
+                  type="tel"
+                  value={mobileNumber}
+                  onChange={(e) => {
+                    setMobileNumber(e.target.value);
+                    clearFieldError("mobileNumber");
+                  }}
+                  placeholder="241234567"
+                  autoComplete="tel-national"
+                  aria-invalid={Boolean(fieldErrors.mobileNumber)}
+                  aria-describedby={fieldErrors.mobileNumber ? "guest-mobile-error" : undefined}
+                  className="border-0 outline-none rounded-none px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-transparent transition-all font-jako-medium flex-1 min-w-0"
+                />
+              </div>
+              {fieldErrors.mobileNumber && (
+                <p id="guest-mobile-error" role="alert" className="text-[12px] text-[#BC2623] font-jako-medium">
+                  {fieldErrors.mobileNumber}
+                </p>
+              )}
           </div>
           <div className="flex flex-col gap-1.5">
             <label
@@ -452,7 +511,7 @@ function PaymentCheckoutInner({
           type="button"
           onClick={handleCreateBooking}
           disabled={!canPay || isLoading}
-          className="w-full mt-2 bg-[#AF2F2C] cursor-pointer hover:bg-[#8e2523] text-white py-4 rounded-full text-[20px] font-[400] tracking-wider uppercase transition-all duration-200 shadow-sm font-jako-bold disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full mt-6 bg-[#AF2F2C] cursor-pointer hover:bg-[#8e2523] text-white py-4 rounded-full text-[20px] font-[400] tracking-wider uppercase transition-all duration-200 shadow-sm font-jako-bold disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {payLabel}
         </button>
@@ -496,12 +555,17 @@ function PaymentCheckoutInner({
 
 export default function PaymentCheckout({
   onSubtitleChange,
+  onBackHrefChange,
 }: {
   onSubtitleChange: (subtitle: string) => void;
+  onBackHrefChange: (href: string) => void;
 }) {
   return (
     <Suspense fallback={<OrderSummarySkeleton />}>
-      <PaymentCheckoutInner onSubtitleChange={onSubtitleChange} />
+      <PaymentCheckoutInner
+        onSubtitleChange={onSubtitleChange}
+        onBackHrefChange={onBackHrefChange}
+      />
     </Suspense>
   );
 }

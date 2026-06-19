@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import AccommodationBookingPanel from "@/lib/components/accommodations/AccommodationBookingPanel";
 import AmenityList from "@/lib/components/accommodations/AmenityList";
 import RoomImageGallery from "@/lib/components/accommodations/RoomImageGallery";
-import { FadeIn, StaggerItem, SectionFade } from "@/lib/components/MotionWrapper";
 import {
     fetchRoomBySlug,
     fetchRooms,
@@ -80,17 +79,14 @@ export default async function AccommodationDetailPage({
 
 
             <section className="max-w-[1440px] mx-auto relative z-30 px-12 mt-6 sm:-mt-[70px] md:-mt-[85px] mb-4 sm:mb-0 hidden lg:block ">
-                {/* 1. We wrap the parent div in StaggerContainer */}
-
                 <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-end sm:gap-2.5">
                     {tabs.map((tab) => {
                         const isActive = room.slug === tab.slug;
                         return (
-
-                            <StaggerItem key={tab.slug}>
-                                <Link
-                                    scroll={false}
-                                    href={`/accommodations/${tab.slug}`}
+                            <Link
+                                key={tab.slug}
+                                scroll={false}
+                                href={`/accommodations/${tab.slug}`}
                                     className={`
                                 px-3 sm:px-7 py-4 lg:text-[16px] text-[12px] tracking-wider font-[400] 
                                 rounded-xl sm:rounded-b-none sm:rounded-t-xl shrink-0 transition-all duration-150 
@@ -103,7 +99,6 @@ export default async function AccommodationDetailPage({
                                 >
                                     {tab.label}
                                 </Link>
-                            </StaggerItem>
                         );
                     })}
                 </div>
@@ -156,8 +151,7 @@ export default async function AccommodationDetailPage({
 
 
             {/* mobile section  */}
-            <SectionFade delay={0}>
-                <section className="max-w-[1140px] mx-auto relative z-30 px-6 mt-6   sm:-mt-[70px] md:-mt-[85px] mb-4 sm:mb-0 lg:hidden">
+            <section className="max-w-[1140px] mx-auto relative z-30 px-6 mt-6   sm:-mt-[70px] md:-mt-[85px] mb-4 sm:mb-0 lg:hidden">
 
                     <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-end sm:gap-2.5">
                         {tabs.map((tab) => {
@@ -181,13 +175,11 @@ export default async function AccommodationDetailPage({
                                 </Link>
                             );
                         })}
-                    </div>
-                </section>
-            </SectionFade>
+                </div>
+            </section>
 
             {/* Main Details Showcase Card */}
-            <SectionFade delay={0.2}>
-                <section className="lg:hidden max-w-[1140px] mx-auto relative z-20 px-6 pb-20">
+            <section className="lg:hidden max-w-[1140px] mx-auto relative z-20 px-6 pb-20">
 
                     <div className="bg-white rounded-3xl sm:rounded-t-none sm:rounded-tr-3xl sm:rounded-b-3xl shadow-xl border border-[#ebe5dd] p-6 md:p-10">
                         <div className="grid lg:grid-cols-12 gap-10 items-start">
@@ -232,7 +224,6 @@ export default async function AccommodationDetailPage({
                         </div>
                     </div>
                 </section>
-            </SectionFade>
         </main>
     );
 }

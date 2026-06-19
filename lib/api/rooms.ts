@@ -118,6 +118,7 @@ export function mapRoomToTourItem(room: Room, id: number): TourItemWithSlug {
     feature,
     labelType,
     labelValue,
+    gallerySection: "all",
     slug: room.slug,
   };
 }
@@ -257,6 +258,50 @@ export async function fetchRoomBySlugClient(
 
   const json: RoomDetailResponse = await response.json();
   return json.success ? json.data : null;
+}
+
+const availabilityInFlight = new Map<string, Promise<RoomAvailability | null>>();
+const availabilityCache = new Map<
+  string,
+  { fetchedAt: number; data: RoomAvailability | null }
+>();
+const AVAILABILITY_CACHE_MS = 15_000;
+
+function availabilityRequestKey(
+  idOrSlug: string,
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate">
+): string {
+  return `${idOrSlug}|${query.checkInDate}|${query.checkOutDate}`;
+}
+
+/** Dedupes identical availability requests (e.g. desktop + mobile booking panels). */
+export async function fetchRoomAvailabilityClientShared(
+  idOrSlug: string,
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
+): Promise<RoomAvailability | null> {
+  if (!query.checkInDate || !query.checkOutDate) return null;
+
+  const key = availabilityRequestKey(idOrSlug, query);
+  const cached = availabilityCache.get(key);
+  if (cached && Date.now() - cached.fetchedAt < AVAILABILITY_CACHE_MS) {
+    return cached.data;
+  }
+
+  let pending = availabilityInFlight.get(key);
+  if (!pending) {
+    pending = fetchRoomBySlugClient(idOrSlug, query)
+      .then((room) => room?.availability ?? null)
+      .then((data) => {
+        availabilityCache.set(key, { fetchedAt: Date.now(), data });
+        return data;
+      })
+      .finally(() => {
+        availabilityInFlight.delete(key);
+      });
+    availabilityInFlight.set(key, pending);
+  }
+
+  return pending;
 }
 
 /** Live availability fetch (no cache) — used by the room API proxy with stay params. */

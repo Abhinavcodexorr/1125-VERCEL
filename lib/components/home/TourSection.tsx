@@ -4,13 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { tours } from "@/lib/data/tours";
-import { getAccommodationHref, type TourItemWithSlug } from "@/lib/api/rooms";
 import { motion, Variants } from "framer-motion";
-
-const STATIC_TOURS: TourItemWithSlug[] = tours.map((tour) => ({
-  ...tour,
-  slug: tour.title.toLowerCase().includes("chalet") ? "chalets" : "the-villa",
-}));
 
 // Animation Variants
 const fadeInUp: Variants = {
@@ -125,7 +119,7 @@ export default function TourSection() {
               WebkitOverflowScrolling: "touch",
             }}
           >
-            {STATIC_TOURS.map((tour) => (
+            {tours.map((tour) => (
               <motion.div
                 key={tour.id}
                 variants={fadeInUp}
@@ -148,8 +142,8 @@ export default function TourSection() {
                     <div className="flex justify-between items-start gap-3 pt-5 px-1">
                       <h3 className="font-ogg-regular text-white text-[22px] lg:text-[24px] leading-[1.15] font-[500] tracking-wide capitalize pr-2">{tour.title}</h3>
                       <Link
-                        href={getAccommodationHref(tour.slug)}
-                        aria-label={`View ${tour.title}`}
+                        href={`/gallery#${tour.gallerySection}`}
+                        aria-label={`View ${tour.title} in gallery`}
                         className="w-[31px] h-[31px] rounded-full bg-[#AE2020] hover:bg-[#AE2020] flex items-center justify-center shrink-0 transition-colors mt-0.5 shadow-sm cursor-pointer"
                       >
                         <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">

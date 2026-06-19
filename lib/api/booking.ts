@@ -50,6 +50,43 @@ export const COUNTRY_CODE_OPTIONS = [
   { label: "AE +971", value: "971" },
 ] as const;
 
+export type GuestFieldErrors = {
+  firstName?: string;
+  email?: string;
+  mobileNumber?: string;
+};
+
+export function validateGuestDetailsFields(
+  guest: Partial<GuestDetails>
+): GuestFieldErrors {
+  const errors: GuestFieldErrors = {};
+
+  if (!guest.firstName?.trim()) {
+    errors.firstName = "First name is required";
+  }
+
+  if (!guest.email?.trim()) {
+    errors.email = "Email address is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email.trim())) {
+    errors.email = "Please enter a valid email address";
+  }
+
+  if (!guest.mobileNumber?.trim()) {
+    errors.mobileNumber = "Mobile number is required";
+  } else {
+    const mobile = formatGuestMobileNumber(
+      guest.countryCode ?? "",
+      guest.mobileNumber
+    );
+
+    if (mobile.replace(/\D/g, "").length < 9) {
+      errors.mobileNumber = "Please enter a valid mobile number";
+    }
+  }
+
+  return errors;
+}
+
 export function formatGuestMobileNumber(
   countryCode: string,
   mobileNumber: string
@@ -73,31 +110,8 @@ export function formatGuestMobileNumber(
 export function validateGuestDetails(
   guest: Partial<GuestDetails>
 ): string | null {
-  if (!guest.firstName?.trim()) {
-    return "guestDetails with firstName, lastName, email, and mobileNumber are required";
-  }
-  if (!guest.lastName?.trim()) {
-    return "guestDetails with firstName, lastName, email, and mobileNumber are required";
-  }
-  if (!guest.email?.trim()) {
-    return "guestDetails with firstName, lastName, email, and mobileNumber are required";
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email.trim())) {
-    return "Please enter a valid email address";
-  }
-  if (!guest.mobileNumber?.trim()) {
-    return "guestDetails with firstName, lastName, email, and mobileNumber are required";
-  }
-
-  const mobile = formatGuestMobileNumber(
-    guest.countryCode ?? "",
-    guest.mobileNumber
-  );
-
-  if (mobile.replace(/\D/g, "").length < 9) {
-    return "Please enter a valid mobile number";
-  }
-  return null;
+  const errors = validateGuestDetailsFields(guest);
+  return errors.firstName ?? errors.email ?? errors.mobileNumber ?? null;
 }
 
 export function validateCreateBookingPayload(

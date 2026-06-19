@@ -1,13 +1,15 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import BookingBox, {
   type BookingBoxHandle,
   type BookingSelection,
 } from "@/lib/components/accommodations/BookingBox";
 import CompleteReservationButton from "@/lib/components/accommodations/CompleteReservationButton";
+import { getCartClient } from "@/lib/api/cart";
 import {
-  fetchRoomBySlugClient,
+  fetchRoomAvailabilityClientShared,
   formatAvailabilityLabel,
   type RoomAvailability,
 } from "@/lib/api/rooms";
@@ -19,6 +21,10 @@ interface AccommodationBookingPanelProps {
   availabilityUnit?: string;
   /** Live check-in/check-out availability — chalets only. */
   checkAvailability?: boolean;
+}
+
+function availabilityQueryKey(selection: BookingSelection): string {
+  return `${selection.checkInDate}|${selection.checkOutDate}`;
 }
 
 function AvailabilityBadge({
@@ -62,20 +68,73 @@ function AccommodationBookingPanelInner({
   availabilityUnit = "Chalet",
   checkAvailability = false,
 }: AccommodationBookingPanelProps) {
+  const searchParams = useSearchParams();
+  const cartId = searchParams.get("cartId");
+
   const bookingRef = useRef<BookingBoxHandle>(null);
   const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
   const showQuantityPickerRef = useRef(totalUnits > 1);
+  const lastAvailabilityQueryRef = useRef<string | null>(null);
 
+  const [bookingReady, setBookingReady] = useState(!cartId);
+  const [cartSelection, setCartSelection] = useState<
+    Partial<BookingSelection> | undefined
+  >();
   const [availability, setAvailability] = useState<RoomAvailability | null>(
     null
   );
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
 
+  useEffect(() => {
+    if (!cartId) return;
+
+    let cancelled = false;
+
+    async function loadCartSelection() {
+      try {
+        const result = await getCartClient(cartId);
+        if (cancelled) return;
+
+        if (result.success && result.data) {
+          const item =
+            result.data.items.find((entry) => entry.roomId === roomId) ??
+            result.data.items[0];
+
+          if (item) {
+            setCartSelection({
+              checkInDate: item.checkInDate,
+              checkOutDate: item.checkOutDate,
+              adults: item.adults,
+              children: item.children,
+              quantity: item.quantity,
+            });
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setBookingReady(true);
+        }
+      }
+    }
+
+    loadCartSelection();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cartId, roomId]);
+
   const refreshAvailability = useCallback(
     (selection: BookingSelection) => {
       if (!checkAvailability) return;
       if (!selection.checkInDate || !selection.checkOutDate) return;
+
+      const queryKey = availabilityQueryKey(selection);
+      if (lastAvailabilityQueryRef.current === queryKey) {
+        return;
+      }
+      lastAvailabilityQueryRef.current = queryKey;
 
       if (fetchTimerRef.current) {
         clearTimeout(fetchTimerRef.current);
@@ -85,21 +144,22 @@ function AccommodationBookingPanelInner({
         const requestId = ++requestIdRef.current;
         setIsLoadingAvailability(true);
 
-        const includeQuantity = showQuantityPickerRef.current;
-
         try {
-          const room = await fetchRoomBySlugClient(roomId, {
-            checkInDate: selection.checkInDate,
-            checkOutDate: selection.checkOutDate,
-            adults: selection.adults,
-            ...(includeQuantity ? { quantity: selection.quantity } : {}),
-          });
+          const availabilityResult = await fetchRoomAvailabilityClientShared(
+            roomId,
+            {
+              checkInDate: selection.checkInDate,
+              checkOutDate: selection.checkOutDate,
+              adults: selection.adults,
+            }
+          );
 
           if (requestId !== requestIdRef.current) return;
 
-          if (room?.availability) {
-            setAvailability(room.availability);
-            showQuantityPickerRef.current = room.availability.showQuantityPicker;
+          if (availabilityResult) {
+            setAvailability(availabilityResult);
+            showQuantityPickerRef.current =
+              availabilityResult.showQuantityPicker;
           } else {
             setAvailability(null);
           }
@@ -150,6 +210,33 @@ function AccommodationBookingPanelInner({
     ? Boolean(availability?.isAvailable) && !isLoadingAvailability
     : true;
 
+  if (!bookingReady) {
+    return (
+      <>
+        {checkAvailability && totalUnits > 1 && (
+          <AvailabilityBadge
+            label={availabilityLabel}
+            isLoading
+            isAvailable={false}
+          />
+        )}
+        <BookingBoxSkeleton showQuantity={totalUnits > 1} />
+        <CompleteReservationButton
+          roomId={roomId}
+          showQuantity={totalUnits > 1}
+          disabled
+          getBooking={() => ({
+            checkInDate: "",
+            checkOutDate: "",
+            adults: 1,
+            children: 0,
+            quantity: 1,
+          })}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       {showAvailabilityBadge && (
@@ -164,6 +251,7 @@ function AccommodationBookingPanelInner({
         ref={bookingRef}
         showQuantity={showQuantityPicker}
         maxQuantity={maxQuantity}
+        initialSelection={cartSelection}
         onSelectionChange={refreshAvailability}
       />
 

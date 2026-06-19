@@ -3,8 +3,10 @@ export interface TourItem {
   image: string;
   title: string;
   feature: string;
-  labelType: string;  // Dynamically populates the bottom-left table cell label
-  labelValue: string; // Dynamically populates the bottom-right table cell value
+  labelType: string;
+  labelValue: string;
+  /** Gallery category hash to scroll to on /gallery. */
+  gallerySection: string;
 }
 
 export const tours: TourItem[] = [
@@ -15,6 +17,7 @@ export const tours: TourItem[] = [
     feature: "Ocean View",
     labelType: "Capacity",
     labelValue: "200 Guests",
+    gallerySection: "deck-events",
   },
   {
     id: 2,
@@ -23,6 +26,7 @@ export const tours: TourItem[] = [
     feature: "Private Terrace, Direct Swim-Up Pool Access",
     labelType: "Units",
     labelValue: "5",
+    gallerySection: "pool-beach",
   },
   {
     id: 3,
@@ -31,6 +35,7 @@ export const tours: TourItem[] = [
     feature: "Private Ocean-Facing Pool, Open-Plan Living",
     labelType: "Occupancy",
     labelValue: "10",
+    gallerySection: "interiors",
   },
   {
     id: 4,
@@ -39,5 +44,6 @@ export const tours: TourItem[] = [
     feature: "Panoramic Views",
     labelType: "Capacity",
     labelValue: "4 Guests",
+    gallerySection: "outdoor-pergola",
   },
 ];

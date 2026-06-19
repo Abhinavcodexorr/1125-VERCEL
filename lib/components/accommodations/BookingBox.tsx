@@ -19,6 +19,7 @@ export interface BookingBoxHandle {
 interface BookingBoxProps {
     showQuantity?: boolean;
     maxQuantity?: number;
+    initialSelection?: Partial<BookingSelection>;
     onSelectionChange?: (selection: BookingSelection) => void;
 }
 
@@ -41,25 +42,43 @@ function formatBookingDate(date: Date): string {
     return `${year}-${month}-${day}`;
 }
 
+function parseBookingDate(value: string): Date {
+    const [year, month, day] = value.split("-").map(Number);
+    return startOfDay(new Date(year, month - 1, day));
+}
+
 // Prop add kiya hai showQuantity taaki sirf Chalets mein dikhe
 const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function BookingBox(
-    { showQuantity = false, maxQuantity, onSelectionChange },
+    { showQuantity = false, maxQuantity, initialSelection, onSelectionChange },
     ref
 ) {
-    const [checkIn, setCheckIn] = useState<Date | null>(null);
-    const [checkOut, setCheckOut] = useState<Date | null>(null);
-    const [adults, setAdults] = useState(2);
-    const [children, setChildren] = useState(0);
-    const [quantity, setQuantity] = useState(1);
+    const [checkIn, setCheckIn] = useState<Date | null>(() => {
+        if (initialSelection?.checkInDate) {
+            return parseBookingDate(initialSelection.checkInDate);
+        }
+        return null;
+    });
+    const [checkOut, setCheckOut] = useState<Date | null>(() => {
+        if (initialSelection?.checkOutDate) {
+            return parseBookingDate(initialSelection.checkOutDate);
+        }
+        return null;
+    });
+    const [adults, setAdults] = useState(initialSelection?.adults ?? 2);
+    const [children, setChildren] = useState(initialSelection?.children ?? 0);
+    const [quantity, setQuantity] = useState(initialSelection?.quantity ?? 1);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (initialSelection?.checkInDate || initialSelection?.checkOutDate) {
+            return;
+        }
         const today = startOfDay(new Date());
         setCheckIn(today);
         setCheckOut(addDays(today, 1));
-    }, []);
+    }, [initialSelection?.checkInDate, initialSelection?.checkOutDate]);
 
     useEffect(() => {
         if (!checkIn || !checkOut || !onSelectionChange) return;

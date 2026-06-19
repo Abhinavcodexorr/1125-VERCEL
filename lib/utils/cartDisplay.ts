@@ -90,6 +90,13 @@ export function getPrimaryRoomTitle(cart: CartData): string {
   return cart.items[0]?.roomSnapshot.title ?? "your stay";
 }
 
+export function getPrimaryRoomDetailHref(cart: CartData | null | undefined): string {
+  const slug = cart?.items[0]?.roomSnapshot.slug?.trim();
+  const base = slug ? `/accommodations/${slug}` : "/accommodations";
+  const cartId = cart?.cartId?.trim();
+  return cartId ? `${base}?cartId=${encodeURIComponent(cartId)}` : base;
+}
+
 export function getItemLineTotal(item: CartItem): number {
   return item.subTotal ?? item.pricePerNight * item.nights * item.quantity;
 }
