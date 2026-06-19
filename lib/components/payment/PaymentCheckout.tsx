@@ -23,6 +23,10 @@ import {
 } from "@/lib/utils/cartDisplay";
 import { isRemoteImage } from "@/lib/utils/image";
 
+function sanitizeMobileInput(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 10);
+}
+
 function OrderSummarySkeleton() {
   return (
     <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-6 lg:col-span-4 lg:sticky lg:top-6 animate-pulse">
@@ -428,7 +432,7 @@ function PaymentCheckoutInner({
                 autoComplete="email"
                 aria-invalid={Boolean(fieldErrors.email)}
                 aria-describedby={fieldErrors.email ? "guest-email-error" : undefined}
-                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-medium ${inputBorderClass(Boolean(fieldErrors.email))}`}
+                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-bold ${inputBorderClass(Boolean(fieldErrors.email))}`}
               />
               {fieldErrors.email && (
                 <p id="guest-email-error" role="alert" className="text-[12px] text-[#BC2623] font-jako-medium">
@@ -465,16 +469,18 @@ function PaymentCheckoutInner({
                 <input
                   id="guest-mobile"
                   type="tel"
+                  inputMode="numeric"
                   value={mobileNumber}
                   onChange={(e) => {
-                    setMobileNumber(e.target.value);
+                    setMobileNumber(sanitizeMobileInput(e.target.value));
                     clearFieldError("mobileNumber");
                   }}
                   placeholder="241234567"
                   autoComplete="tel-national"
+                  maxLength={10}
                   aria-invalid={Boolean(fieldErrors.mobileNumber)}
                   aria-describedby={fieldErrors.mobileNumber ? "guest-mobile-error" : undefined}
-                  className="border-0 outline-none rounded-none px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-transparent transition-all font-jako-medium flex-1 min-w-0"
+                  className="border-0 outline-none rounded-none px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-transparent transition-all font-jako-bold flex-1 min-w-0"
                 />
               </div>
               {fieldErrors.mobileNumber && (
