@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { getCartClient, type CartData } from "@/lib/api/cart";
 import {
@@ -71,7 +71,7 @@ function OrderSummaryError({
         Browse accommodations
       </Link>
       {cartId && (
-        <p className="mt-3 text-[12px] text-[#8C7A7A] font-jako-regular break-all">
+        <p className="mt-3 text-[12px] text-[#444444] font-jako-regular break-all">
           Cart ID: {cartId}
         </p>
       )}
@@ -163,6 +163,7 @@ function PaymentCheckoutInner({
   onBackHrefChange: (href: string) => void;
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const cartId = searchParams.get("cartId");
   const [cart, setCart] = useState<CartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -292,12 +293,14 @@ function PaymentCheckoutInner({
         },
       });
 
-      if (!result.success || !result.data?.checkoutUrl) {
+      if (!result.success || !result.data) {
         setBookingError(result.message || "Failed to create booking");
         return;
       }
 
-      window.location.href = result.data.checkoutUrl;
+      // For now: successful booking → thank-you page.
+      // When Hubtel is live again: window.location.href = result.data.checkoutUrl
+      router.push("/thank-you");
     } catch {
       setBookingError("Failed to create booking");
     } finally {
@@ -356,7 +359,7 @@ function PaymentCheckoutInner({
           </p>
         )}
 
-        <h2 className="text-[24px] font-[400] text-[#66839C] font-jako-bold mb-6">
+        <h2 className="text-[24px] font-[400] text-[#7CA5C8] font-jako-bold mb-6">
           Contact Details
         </h2>
         <div className="space-y-4">
@@ -364,7 +367,7 @@ function PaymentCheckoutInner({
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="guest-first-name"
-                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
+                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#444444]"
               >
                 First Name <span className="text-[#BC2623]">*</span>
               </label>
@@ -380,7 +383,7 @@ function PaymentCheckoutInner({
                 autoComplete="given-name"
                 aria-invalid={Boolean(fieldErrors.firstName)}
                 aria-describedby={fieldErrors.firstName ? "guest-first-name-error" : undefined}
-                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-bold ${inputBorderClass(Boolean(fieldErrors.firstName))}`}
+                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-bold ${inputBorderClass(Boolean(fieldErrors.firstName))}`}
               />
               {fieldErrors.firstName && (
                 <p id="guest-first-name-error" role="alert" className="text-[12px] text-[#BC2623] font-jako-medium">
@@ -391,7 +394,7 @@ function PaymentCheckoutInner({
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="guest-last-name"
-                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
+                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#444444]"
               >
                 Last Name
               </label>
@@ -402,14 +405,14 @@ function PaymentCheckoutInner({
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Kofi"
                 autoComplete="family-name"
-                className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-bold"
+                className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-bold"
               />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="guest-email"
-                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
+                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#444444]"
               >
                 Email Address <span className="text-[#BC2623]">*</span>
               </label>
@@ -425,7 +428,7 @@ function PaymentCheckoutInner({
                 autoComplete="email"
                 aria-invalid={Boolean(fieldErrors.email)}
                 aria-describedby={fieldErrors.email ? "guest-email-error" : undefined}
-                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-medium ${inputBorderClass(Boolean(fieldErrors.email))}`}
+                className={`border outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-medium ${inputBorderClass(Boolean(fieldErrors.email))}`}
               />
               {fieldErrors.email && (
                 <p id="guest-email-error" role="alert" className="text-[12px] text-[#BC2623] font-jako-medium">
@@ -436,7 +439,7 @@ function PaymentCheckoutInner({
           <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="guest-mobile"
-                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
+                className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#444444]"
               >
                 Mobile Number <span className="text-[#BC2623]">*</span>
               </label>
@@ -451,10 +454,10 @@ function PaymentCheckoutInner({
                     clearFieldError("mobileNumber");
                   }}
                   aria-label="Country code"
-                  className="border-0 border-r border-[#E5D7D7] outline-none rounded-none px-3 py-3 text-[14px] font-[400] text-[#2C242280] bg-transparent transition-all font-jako-medium shrink-0 min-w-[110px]"
+                  className="border-0 border-r border-[#E5D7D7] outline-none rounded-none px-3 py-3 text-[14px] font-[400] text-[#2C2422] bg-transparent transition-all font-jako-medium shrink-0 min-w-[110px]"
                 >
                   {COUNTRY_CODE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
+                    <option key={option.label} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -471,7 +474,7 @@ function PaymentCheckoutInner({
                   autoComplete="tel-national"
                   aria-invalid={Boolean(fieldErrors.mobileNumber)}
                   aria-describedby={fieldErrors.mobileNumber ? "guest-mobile-error" : undefined}
-                  className="border-0 outline-none rounded-none px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-transparent transition-all font-jako-medium flex-1 min-w-0"
+                  className="border-0 outline-none rounded-none px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-transparent transition-all font-jako-medium flex-1 min-w-0"
                 />
               </div>
               {fieldErrors.mobileNumber && (
@@ -483,7 +486,7 @@ function PaymentCheckoutInner({
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="guest-special-requests"
-              className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#8C7A7A]"
+              className="text-[12px] uppercase tracking-wider font-[400] font-jako-bold text-[#444444]"
             >
               Special Requests <span className="normal-case">(optional)</span>
             </label>
@@ -493,7 +496,7 @@ function PaymentCheckoutInner({
               onChange={(e) => setSpecialRequests(e.target.value)}
               placeholder="Any special requests for your stay"
               rows={3}
-              className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C242280] bg-[#FFFEF8] transition-all font-jako-medium resize-none"
+              className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-medium resize-none"
             />
           </div>
         </div>
@@ -501,7 +504,7 @@ function PaymentCheckoutInner({
         {bookingError && (
           <p
             role="alert"
-            className="mb-6 text-[14px] text-[#BC2623] font-jako-medium leading-relaxed"
+            className="mt-3 mb-6 text-[14px] text-[#BC2623] font-jako-medium leading-relaxed"
           >
             {bookingError}
           </p>
@@ -516,7 +519,7 @@ function PaymentCheckoutInner({
           {payLabel}
         </button>
 
-        <p className="text-center text-[12px] text-gray-400 mt-5 tracking-wide font-jako-bold flex items-center justify-center gap-1 font-[400]">
+        <p className="text-center text-[13px] text-[#444444] mt-5 tracking-wide font-jako-bold flex items-center justify-center gap-1 font-[400]">
           <span>
             <svg
               width="12"
@@ -528,13 +531,13 @@ function PaymentCheckoutInner({
               <g clipPath="url(#clip0_1_3929)">
                 <path
                   d="M9.5 5.5H2.5C1.94772 5.5 1.5 5.94772 1.5 6.5V10C1.5 10.5523 1.94772 11 2.5 11H9.5C10.0523 11 10.5 10.5523 10.5 10V6.5C10.5 5.94772 10.0523 5.5 9.5 5.5Z"
-                  stroke="#8C7A7A"
+                  stroke="#444444"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <path
                   d="M3.5 5.5V3.5C3.5 2.83696 3.76339 2.20107 4.23223 1.73223C4.70107 1.26339 5.33696 1 6 1C6.66304 1 7.29893 1.26339 7.76777 1.73223C8.23661 2.20107 8.5 2.83696 8.5 3.5V5.5"
-                  stroke="#8C7A7A"
+                  stroke="#444444"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />

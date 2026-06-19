@@ -11,7 +11,7 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
 
-  const hideLayoutPages = ["/payment"];
+  const hideLayoutPages = ["/payment", "/thank-you"];
 
   const hideLayout = hideLayoutPages.includes(pathname);
 

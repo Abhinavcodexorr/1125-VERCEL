@@ -84,7 +84,7 @@ export default function PaymentPage() {
           <h1 className="font-ogg-regular text-[40px] sm:text-[48px] md:text-[48px] text-[#6082a4] font-[500] tracking-wide">
             Complete Your Payment
           </h1>
-          <p className="mt-3 text-[16px] sm:text-[16px] font-[400] text-gray-500 max-w-[600px] mx-auto tracking-wide font-jako-bold">
+          <p className="mt-3 text-[16px] sm:text-[16px] font-[400] text-[#444444] max-w-[600px] mx-auto tracking-wide font-jako-bold">
             {subtitle}
           </p>
         </div>

@@ -23,11 +23,14 @@ export interface CreateBookingPayload {
 
 export interface CreateBookingData {
   bookingReference: string;
-  bookingIds: string[];
-  totalAmount: number;
-  currency: string;
-  paymentMethod: string;
-  checkoutUrl: string;
+  bookingIds?: string[];
+  status?: string;
+  paymentStatus?: string;
+  totalAmount?: number;
+  currency?: string;
+  paymentMethod?: string;
+  /** Hubtel checkout — restore redirect when payment gateway is live. */
+  checkoutUrl?: string;
   bookings: unknown[];
 }
 
@@ -39,16 +42,9 @@ export interface CreateBookingResponse {
   error?: string | null;
 }
 
-export const COUNTRY_CODE_OPTIONS = [
-  { label: "GH +233", value: "233" },
-  { label: "NG +234", value: "234" },
-  { label: "US +1", value: "1" },
-  { label: "UK +44", value: "44" },
-  { label: "ZA +27", value: "27" },
-  { label: "KE +254", value: "254" },
-  { label: "IN +91", value: "91" },
-  { label: "AE +971", value: "971" },
-] as const;
+import { COUNTRY_CODE_OPTIONS } from "@/lib/data/countryCodes";
+
+export { COUNTRY_CODE_OPTIONS };
 
 export type GuestFieldErrors = {
   firstName?: string;
