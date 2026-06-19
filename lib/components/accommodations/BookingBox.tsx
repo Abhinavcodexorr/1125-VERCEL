@@ -42,9 +42,23 @@ function formatBookingDate(date: Date): string {
     return `${year}-${month}-${day}`;
 }
 
-function parseBookingDate(value: string): Date {
-    const [year, month, day] = value.split("-").map(Number);
-    return startOfDay(new Date(year, month - 1, day));
+function parseBookingDate(value: string): Date | null {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (dateMatch) {
+        const year = Number(dateMatch[1]);
+        const month = Number(dateMatch[2]);
+        const day = Number(dateMatch[3]);
+        const parsed = startOfDay(new Date(year, month - 1, day));
+        if (!Number.isNaN(parsed.getTime())) {
+            return parsed;
+        }
+    }
+
+    const fallback = startOfDay(new Date(trimmed));
+    return Number.isNaN(fallback.getTime()) ? null : fallback;
 }
 
 // Prop add kiya hai showQuantity taaki sirf Chalets mein dikhe
