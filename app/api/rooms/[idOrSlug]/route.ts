@@ -4,7 +4,7 @@ import {
 } from "@/lib/api/rooms";
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: NextRequest,
@@ -41,9 +41,7 @@ export async function GET(
       { success: true, data: room },
       {
         headers: {
-          "Cache-Control": hasAvailabilityQuery
-            ? "private, no-store"
-            : "public, s-maxage=60, stale-while-revalidate=120",
+          "Cache-Control": "no-store, max-age=0, must-revalidate",
         },
       }
     );

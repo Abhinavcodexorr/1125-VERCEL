@@ -221,7 +221,7 @@ const fetchRoomBySlugCached = cache(
 
     const qs = params.toString();
     const url = `${getApiBaseUrl()}/api/v1/rooms/${encodeURIComponent(apiSlug)}${qs ? `?${qs}` : ""}`;
-    const response = await fetchBackend(url, { next: { revalidate: 60 } });
+    const response = await fetchBackend(url, { cache: "no-store" });
 
     if (response.status === 404) return null;
     if (!response.ok) {
@@ -431,7 +431,7 @@ export async function fetchRooms(): Promise<Room[]> {
 
 const fetchRoomsCached = cache(async (): Promise<Room[]> => {
   const response = await fetchBackend(`${getApiBaseUrl()}/api/v1/rooms`, {
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
 
   const rooms = await parseRoomsResponse(response);
