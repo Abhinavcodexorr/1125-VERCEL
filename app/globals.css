@@ -355,3 +355,35 @@ body {
   background: transparent !important;
   color: #ccc !important;
 }
+
+/* Newsletter pill — keep input area same off-white as the container */
+.newsletter-pill {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+
+.newsletter-pill-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.78) inset !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.78) inset !important;
+  color: #1a242d;
+}
+
+.newsletter-pill-input:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  outline: none;
+}
+
+.newsletter-pill-input:-webkit-autofill,
+.newsletter-pill-input:-webkit-autofill:hover,
+.newsletter-pill-input:-webkit-autofill:focus,
+.newsletter-pill-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.78) inset !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.78) inset !important;
+  -webkit-text-fill-color: #1a242d !important;
+  caret-color: #1a242d;
+  transition: background-color 99999s ease-out 0s;
+}

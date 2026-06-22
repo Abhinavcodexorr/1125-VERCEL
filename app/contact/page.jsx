@@ -1,7 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  getContactErrorMessage,
+  getContactSuccessMessage,
+  submitContactMessageClient,
+  validateContactFields,
+} from "@/lib/api/contact";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -14,9 +21,80 @@ const staggerContainer = {
 };
 
 export default function ContactPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [feedback, setFeedback] = useState(null);
+
+  useEffect(() => {
+    if (feedback?.type !== "success") return;
+
+    const timer = window.setTimeout(() => {
+      setFeedback(null);
+    }, 2000);
+
+    return () => window.clearTimeout(timer);
+  }, [feedback]);
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const inputBorderClass = (hasError) =>
+    hasError
+      ? "border-[#BC2623] focus:border-[#BC2623]"
+      : "border-gray-200 focus:border-[#9BB9DA]";
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFeedback(null);
+
+    const errors = validateContactFields({ name, email, message });
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
+    setIsSubmitting(true);
+
+    try {
+      const result = await submitContactMessageClient({ name, email, message });
+
+      if (result.success) {
+        setFeedback({
+          type: "success",
+          message: getContactSuccessMessage(result),
+        });
+        setName("");
+        setEmail("");
+        setMessage("");
+        return;
+      }
+
+      setFeedback({
+        type: "error",
+        message: getContactErrorMessage(result),
+      });
+    } catch {
+      setFeedback({
+        type: "error",
+        message: "Failed to send message. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className="bg-[#FFFEF8] min-h-screen">
-      {/* Banner Section */}
       <motion.section 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -48,11 +126,9 @@ export default function ContactPage() {
         </div>
       </motion.section>
 
-      {/* Main Content Section */}
       <section className="w-full pt-[89.5px] pb-24">
         <div className="flex flex-col lg:flex-row items-start">
           
-          {/* LEFT SIDE - Form (Original Alignment) */}
           <motion.div 
             variants={staggerContainer}
             initial="hidden"
@@ -64,7 +140,6 @@ export default function ContactPage() {
               Get in
             </motion.h2>
             <motion.h2 variants={fadeInUp} className="font-ogg-regular text-[80px] mt-5 lg:text-[110px] font-[400] leading-[0.85] text-[#9BB9DA]">
-            
               Touch
             </motion.h2>
 
@@ -72,29 +147,111 @@ export default function ContactPage() {
               For exclusive inquiries, private events, or to simply begin your journey to barefoot luxury. We await your whisper.
             </motion.p>
 
-            <motion.form variants={staggerContainer} className="mt-16 space-y-10 max-w-lg">
+            <motion.form
+              variants={staggerContainer}
+              className="mt-16 space-y-10 max-w-lg"
+              onSubmit={handleSubmit}
+            >
               <motion.div variants={fadeInUp}>
-                <label className="block font-jako-bold text-[11px] uppercase tracking-[2px] text-gray-400 mb-2">Your Name</label>
-                <input type="text" placeholder="John Doe" className="w-full bg-transparent border-b border-gray-200 text-[20px] pb-3 outline-none focus:border-[#9BB9DA] transition-colors placeholder:text-[#D5C2C2] text-[#5A4F4D] font-jako-medium"  />
+                <label htmlFor="contact-name" className="block font-jako-bold text-[11px] uppercase tracking-[2px] text-gray-400 mb-2">Your Name</label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    clearFieldError("name");
+                    if (feedback) setFeedback(null);
+                  }}
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  disabled={isSubmitting}
+                  aria-invalid={Boolean(fieldErrors.name)}
+                  aria-describedby={fieldErrors.name ? "contact-name-error" : undefined}
+                  className={`w-full bg-transparent border-b text-[20px] pb-3 outline-none transition-colors placeholder:text-[#D5C2C2] text-[#5A4F4D] font-jako-medium disabled:opacity-60 ${inputBorderClass(Boolean(fieldErrors.name))}`}
+                />
+                {fieldErrors.name && (
+                  <p id="contact-name-error" role="alert" className="mt-2 text-[12px] text-[#BC2623] font-jako-medium">
+                    {fieldErrors.name}
+                  </p>
+                )}
               </motion.div>
 
               <motion.div variants={fadeInUp}>
-                <label className="block font-jako-bold text-[11px] uppercase tracking-[2px] text-gray-400 mb-2">Your Email</label>
-                <input type="email" placeholder="john@example.com" className="w-full bg-transparent border-b border-gray-200 text-[20px] pb-3 outline-none focus:border-[#9BB9DA] transition-colors placeholder:text-[#D5C2C2] text-[#5A4F4D] font-jako-medium" />
+                <label htmlFor="contact-email" className="block font-jako-bold text-[11px] uppercase tracking-[2px] text-gray-400 mb-2">Your Email</label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearFieldError("email");
+                    if (feedback) setFeedback(null);
+                  }}
+                  placeholder="john@example.com"
+                  autoComplete="email"
+                  disabled={isSubmitting}
+                  aria-invalid={Boolean(fieldErrors.email)}
+                  aria-describedby={fieldErrors.email ? "contact-email-error" : undefined}
+                  className={`w-full bg-transparent border-b text-[20px] pb-3 outline-none transition-colors placeholder:text-[#D5C2C2] text-[#5A4F4D] font-jako-medium disabled:opacity-60 ${inputBorderClass(Boolean(fieldErrors.email))}`}
+                />
+                {fieldErrors.email && (
+                  <p id="contact-email-error" role="alert" className="mt-2 text-[12px] text-[#BC2623] font-jako-medium">
+                    {fieldErrors.email}
+                  </p>
+                )}
               </motion.div>
 
               <motion.div variants={fadeInUp}>
-                <label className="block font-jako-bold text-[11px] uppercase tracking-[2px] text-gray-400 mb-2">The Whisper</label>
-                <textarea rows={1} placeholder="How may we assist you?" className="w-full bg-transparent border-b border-gray-200 text-[20px] pb-3 outline-none focus:border-[#9BB9DA] transition-colors placeholder:text-[#D5C2C2] text-[#5A4F4D] font-jako-medium" />
+                <label htmlFor="contact-message" className="block font-jako-bold text-[11px] uppercase tracking-[2px] text-gray-400 mb-2">The Whisper</label>
+                <textarea
+                  id="contact-message"
+                  rows={1}
+                  value={message}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    clearFieldError("message");
+                    if (feedback) setFeedback(null);
+                  }}
+                  placeholder="How may we assist you?"
+                  disabled={isSubmitting}
+                  aria-invalid={Boolean(fieldErrors.message)}
+                  aria-describedby={fieldErrors.message ? "contact-message-error" : undefined}
+                  className={`w-full bg-transparent border-b text-[20px] pb-3 outline-none transition-colors placeholder:text-[#D5C2C2] text-[#5A4F4D] font-jako-medium resize-none disabled:opacity-60 ${inputBorderClass(Boolean(fieldErrors.message))}`}
+                />
+                {fieldErrors.message && (
+                  <p id="contact-message-error" role="alert" className="mt-2 text-[12px] text-[#BC2623] font-jako-medium">
+                    {fieldErrors.message}
+                  </p>
+                )}
               </motion.div>
 
-              <motion.button variants={fadeInUp} className="bg-[#AF2F2C] text-white font-manrope-regular px-10 py-4 rounded-full uppercase tracking-[2px] text-[12px] mt-4">
-                Send Message
+              <motion.button
+                variants={fadeInUp}
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-[#AF2F2C] text-white font-manrope-regular px-10 py-4 rounded-full uppercase tracking-[2px] text-[12px] mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Sending..." : "Send Message"}
               </motion.button>
+
+              {feedback && (
+                <div
+                  id="contact-feedback"
+                  role="alert"
+                  aria-live="polite"
+                  className={`mt-6 rounded-xl border px-5 py-4 text-[15px] leading-relaxed font-jako-medium ${
+                    feedback.type === "success"
+                      ? "border-[#9BB9DA] bg-[#F0F6FC] text-[#2C2422]"
+                      : "border-[#BC2623] bg-[#FFF5F5] text-[#BC2623]"
+                  }`}
+                >
+                  {feedback.message}
+                </div>
+              )}
             </motion.form>
           </motion.div>
 
-          {/* RIGHT SIDE - Exact Figma Specs: 480x600 & Sticking to Right Edge */}
           <div className="w-full md:w-[80px] lg:w-[600px] ml-auto mt-28">
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
@@ -111,7 +268,6 @@ export default function ContactPage() {
                 className="object-cover"
               />
 
-              {/* White Info Box */}
               <div className="absolute bottom-0 right-0 bg-white p-10 lg:p-12  max-w-[250px] lg:max-w-[310px] shadow-sm z-10">
                 <div className="space-y-6 pr-10">
                   <div>
