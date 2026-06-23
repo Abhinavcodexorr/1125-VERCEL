@@ -76,9 +76,8 @@ export default function GalleryPage() {
                         fill
                         priority
                         sizes="calc(100vw - 2rem)"
-                        className="object-cover object-bottom"
+                        className="object-cover object-bottom brightness-125"
                     />
-                    <div className="absolute inset-0 bg-[#00000033]" />
                     <div className="absolute inset-0 flex items-center justify-center">
                         <motion.h1 
                             initial={{ opacity: 0, y: 20 }}
