@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { getCartClient, type CartData } from "@/lib/api/cart";
+import { clearStoredCartId } from "@/lib/utils/cartStorage";
 import {
   COUNTRY_CODE_OPTIONS,
   createBookingClient,
@@ -22,6 +23,8 @@ import {
   getPrimaryRoomDetailHref,
 } from "@/lib/utils/cartDisplay";
 import { isRemoteImage } from "@/lib/utils/image";
+
+type CartStatus = "loading" | "empty" | "expired" | "error" | "ready";
 
 function sanitizeMobileInput(value: string): string {
   return value.replace(/\D/g, "").slice(0, 10);
@@ -80,6 +83,69 @@ function OrderSummaryError({
         </p>
       )}
     </div>
+  );
+}
+
+function OrderSummaryStatePanel({
+  title,
+  message,
+  actionLabel,
+}: {
+  title: string;
+  message: string;
+  actionLabel: string;
+}) {
+  return (
+    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-8 lg:col-span-4 flex flex-col items-center text-center">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#F3E7E7]">
+        <svg
+          className="w-7 h-7 text-[#AF2F2C]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-[20px] font-[400] text-[#2C2422] font-jako-bold mb-2.5">
+        {title}
+      </h3>
+      <p className="text-[14px] text-[#6B6B6B] font-jako-regular leading-relaxed max-w-[320px] mb-6">
+        {message}
+      </p>
+      <Link
+        href="/accommodations"
+        className="min-w-[220px] h-[52px] px-8 rounded-full bg-[#BC2623] text-white text-[14px] font-jako-bold tracking-[1px] uppercase transition-colors hover:bg-[#A92320] inline-flex items-center justify-center shadow-[0_10px_25px_rgba(0,0,0,0.12)]"
+      >
+        {actionLabel}
+      </Link>
+    </div>
+  );
+}
+
+function OrderSummaryEmpty() {
+  return (
+    <OrderSummaryStatePanel
+      title="Your cart is empty"
+      message="You haven't added a room yet. Taking you to our accommodations so you can pick your stay and dates."
+      actionLabel="Browse rooms"
+    />
+  );
+}
+
+function OrderSummaryExpired() {
+  return (
+    <OrderSummaryStatePanel
+      title="Your cart has expired"
+      message="Your reservation hold timed out. Please select your room and dates again."
+      actionLabel="Select your room"
+    />
   );
 }
 
@@ -166,11 +232,13 @@ function PaymentCheckoutInner({
   onSubtitleChange: (subtitle: string) => void;
   onBackHrefChange: (href: string) => void;
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const cartId = searchParams.get("cartId");
   const [cart, setCart] = useState<CartData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [cartStatus, setCartStatus] = useState<CartStatus>("loading");
   const [cartError, setCartError] = useState<string | null>(null);
+  const isLoading = cartStatus === "loading";
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -200,16 +268,15 @@ function PaymentCheckoutInner({
 
     async function loadCart() {
       if (!cartId) {
-        const message = "No cart found. Please complete your reservation first.";
-        setCartError(message);
         setCart(null);
-        setIsLoading(false);
+        setCartError(null);
+        setCartStatus("empty");
         onSubtitleChange("Securely finalize your reservation.");
         onBackHrefChange("/accommodations");
         return;
       }
 
-      setIsLoading(true);
+      setCartStatus("loading");
       setCartError(null);
 
       try {
@@ -217,30 +284,47 @@ function PaymentCheckoutInner({
         if (cancelled) return;
 
         if (!result.success || !result.data) {
-          const message =
-            result.statusCode === 404
-              ? "Cart not found"
-              : result.message || "Failed to retrieve cart";
-          setCartError(message);
           setCart(null);
+          onSubtitleChange("Securely finalize your reservation.");
+          onBackHrefChange("/accommodations");
+
+          // 404 / success:false => the stored id is dead. Drop it so the next
+          // add-to-cart starts a fresh cart, and show the expired empty state.
+          if (result.statusCode === 404) {
+            clearStoredCartId();
+            setCartStatus("expired");
+            return;
+          }
+
+          setCartError(result.message || "Failed to retrieve cart");
+          setCartStatus("error");
+          return;
+        }
+
+        // Cart already past its expiry: treat as expired without keeping the id.
+        const expiry = new Date(result.data.expiresAt).getTime();
+        if (!Number.isNaN(expiry) && expiry <= Date.now()) {
+          clearStoredCartId();
+          setCart(null);
+          setCartStatus("expired");
           onSubtitleChange("Securely finalize your reservation.");
           onBackHrefChange("/accommodations");
           return;
         }
 
         setCart(result.data);
+        setCartStatus("ready");
         onBackHrefChange(getPrimaryRoomDetailHref(result.data));
         onSubtitleChange(
           `Securely finalize your reservation for ${getPrimaryRoomTitle(result.data)}.`
         );
       } catch {
         if (cancelled) return;
-        setCartError("Failed to retrieve cart");
         setCart(null);
+        setCartError("Failed to retrieve cart");
+        setCartStatus("error");
         onSubtitleChange("Securely finalize your reservation.");
         onBackHrefChange("/accommodations");
-      } finally {
-        if (!cancelled) setIsLoading(false);
       }
     }
 
@@ -250,6 +334,60 @@ function PaymentCheckoutInner({
       cancelled = true;
     };
   }, [cartId, onSubtitleChange, onBackHrefChange]);
+
+  // Returning from the external checkout (e.g. browser Back from Hubtel) often
+  // restores this page from the back-forward cache, so React effects never
+  // re-run and the cart stays stale. Force a real reload in that case — it is
+  // exactly what a manual refresh does.
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      const navEntry = performance.getEntriesByType(
+        "navigation"
+      )[0] as PerformanceNavigationTiming | undefined;
+
+      if (event.persisted || navEntry?.type === "back_forward") {
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
+  // Countdown using the cart's expiresAt. When it hits zero we flip to the
+  // expired state locally without hitting the API again.
+  useEffect(() => {
+    if (cartStatus !== "ready" || !cart?.expiresAt) {
+      return;
+    }
+
+    const expiry = new Date(cart.expiresAt).getTime();
+    if (Number.isNaN(expiry)) {
+      return;
+    }
+
+    const tick = () => {
+      if (expiry - Date.now() <= 0) {
+        clearStoredCartId();
+        setCart(null);
+        setCartStatus("expired");
+      }
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [cartStatus, cart?.expiresAt]);
+
+  // No cart in the session: show the empty state briefly, then send the guest
+  // back to accommodations.
+  useEffect(() => {
+    if (cartStatus !== "empty") return;
+    const timer = setTimeout(() => {
+      router.push("/accommodations");
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [cartStatus, router]);
 
   const handleCreateBooking = async () => {
     setBookingError(null);
@@ -328,7 +466,8 @@ function PaymentCheckoutInner({
       : `Pay ${formatMoney(cart.subTotal, cart.currency)}`
     : "Pay Now";
   const canPay = Boolean(
-    cart?.allAvailable &&
+    cartStatus === "ready" &&
+      cart?.allAvailable &&
       cart.items.every((i) => i.isAvailable) &&
       cartId &&
       !isSubmitting
@@ -336,12 +475,19 @@ function PaymentCheckoutInner({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1440px] mx-auto items-start pt-4 py-6 md:py-8 px-6">
-      {isLoading ? (
+      {cartStatus === "loading" ? (
         <OrderSummarySkeleton />
-      ) : cartError || !cart ? (
-        <OrderSummaryError message={cartError ?? "Failed to retrieve cart"} cartId={cartId} />
-      ) : (
+      ) : cartStatus === "empty" ? (
+        <OrderSummaryEmpty />
+      ) : cartStatus === "expired" ? (
+        <OrderSummaryExpired />
+      ) : cartStatus === "ready" && cart ? (
         <OrderSummaryCard cart={cart} />
+      ) : (
+        <OrderSummaryError
+          message={cartError ?? "Failed to retrieve cart"}
+          cartId={cartId}
+        />
       )}
 
       <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xl shadow-[#E5D7D7] p-6 sm:p-10 lg:col-span-8">

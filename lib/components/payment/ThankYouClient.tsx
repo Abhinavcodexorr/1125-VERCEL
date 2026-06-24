@@ -17,6 +17,7 @@ import {
   type ConfirmBookingData,
   type BookingConfirmUiState,
 } from "@/lib/api/booking";
+import { clearStoredCartId } from "@/lib/utils/cartStorage";
 
 const POLL_INTERVAL_MS = 4000;
 const MAX_POLL_DURATION_MS = 40000;
@@ -75,6 +76,9 @@ function ThankYouContentInner() {
       if (state !== "loading" && state !== "pending") {
         isFinalRef.current = true;
         clearStoredReference();
+      }
+      if (state === "success") {
+        clearStoredCartId();
       }
       if (data !== undefined) {
         setConfirmData(data);

@@ -8,6 +8,7 @@ import {
   validateCartPayload,
   type AddToCartPayload,
 } from "@/lib/api/cart";
+import { getStoredCartId, setStoredCartId } from "@/lib/utils/cartStorage";
 
 interface CompleteReservationButtonProps {
   roomId: string;
@@ -43,7 +44,7 @@ export default function CompleteReservationButton({
       payload.quantity = booking.quantity;
     }
 
-    const existingCartId = searchParams.get("cartId");
+    const existingCartId = searchParams.get("cartId") ?? getStoredCartId();
     if (existingCartId) {
       payload.cartId = existingCartId;
     }
@@ -65,6 +66,8 @@ export default function CompleteReservationButton({
         setError(result.message || "Failed to add item to cart");
         return;
       }
+
+      setStoredCartId(result.data.cartId);
 
       router.push(`/payment?cartId=${encodeURIComponent(result.data.cartId)}`);
     } catch {
