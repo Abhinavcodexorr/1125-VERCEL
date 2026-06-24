@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, Variants } from "framer-motion";
 import {
   fetchRoomsClient,
@@ -21,6 +22,38 @@ const fadeInUp: Variants = {
 };
 
 export default function AccommodationsPageClient() {
+  return (
+    <Suspense fallback={<AccommodationsPageContent showPaymentCancelled={false} />}>
+      <AccommodationsPageWithParams />
+    </Suspense>
+  );
+}
+
+function AccommodationsPageWithParams() {
+  const searchParams = useSearchParams();
+  const showPaymentCancelled =
+    searchParams.get("payment") === "cancelled" ||
+    searchParams.get("payment_cancelled") === "1";
+
+  useEffect(() => {
+    if (!showPaymentCancelled) return;
+    try {
+      sessionStorage.removeItem("bookingReference");
+    } catch {
+      // ignore storage errors
+    }
+  }, [showPaymentCancelled]);
+
+  return (
+    <AccommodationsPageContent showPaymentCancelled={showPaymentCancelled} />
+  );
+}
+
+function AccommodationsPageContent({
+  showPaymentCancelled,
+}: {
+  showPaymentCancelled: boolean;
+}) {
   const [listings, setListings] = useState<AccommodationListing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,6 +81,19 @@ export default function AccommodationsPageClient() {
 
   return (
     <main className="bg-[#FFFEF8] min-h-screen font-sans antialiased text-[#444444] overflow-x-hidden">
+      {showPaymentCancelled && (
+        <div className="px-4 pt-4">
+          <div
+            role="alert"
+            className="max-w-[1440px] mx-auto rounded-xl border border-[#BC2623]/30 bg-[#BC2623]/10 px-5 py-4 text-center"
+          >
+            <p className="text-[14px] sm:text-[15px] text-[#BC2623] font-jako-medium">
+              Payment cancelled. Your booking was not completed — you can choose
+              a stay and try again when ready.
+            </p>
+          </div>
+        </div>
+      )}
       <section className="px-4 mt-4 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, scale: 1.05 }}

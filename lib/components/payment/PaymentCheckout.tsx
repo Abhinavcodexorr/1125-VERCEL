@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { getCartClient, type CartData } from "@/lib/api/cart";
 import {
@@ -167,7 +167,6 @@ function PaymentCheckoutInner({
   onBackHrefChange: (href: string) => void;
 }) {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const cartId = searchParams.get("cartId");
   const [cart, setCart] = useState<CartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -298,15 +297,26 @@ function PaymentCheckoutInner({
       });
 
       if (!result.success || !result.data) {
-        setBookingError(result.message || "Failed to create booking");
+        setBookingError(
+          result.statusCode === 500
+            ? "Payment could not start. Try again."
+            : result.message || "Failed to create booking"
+        );
         return;
       }
 
-      // For now: successful booking → thank-you page.
-      // When Hubtel is live again: window.location.href = result.data.checkoutUrl
-      router.push("/thank-you");
+      const { bookingReference, checkoutUrl } = result.data;
+
+      if (!bookingReference?.trim() || !checkoutUrl?.trim()) {
+        setBookingError("Payment could not start. Try again.");
+        return;
+      }
+
+      sessionStorage.setItem("bookingReference", bookingReference.trim());
+      window.location.href = checkoutUrl.trim();
+      return;
     } catch {
-      setBookingError("Failed to create booking");
+      setBookingError("Payment could not start. Try again.");
     } finally {
       setIsSubmitting(false);
     }

@@ -141,10 +141,12 @@ function buildBookingBody(payload: CreateBookingPayload): Record<string, unknown
     countryCode,
     payload.guestDetails.mobileNumber
   );
+  const firstName = payload.guestDetails.firstName.trim();
+  const lastName = payload.guestDetails.lastName?.trim() || firstName;
 
   const guestDetails: Record<string, string> = {
-    firstName: payload.guestDetails.firstName.trim(),
-    lastName: payload.guestDetails.lastName.trim(),
+    firstName,
+    lastName,
     email: payload.guestDetails.email.trim(),
     mobileNumber,
   };
@@ -204,7 +206,7 @@ export async function createBookingClient(
   const response = await fetch("/api/booking/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(buildBookingBody(payload)),
+    body: JSON.stringify(payload),
   });
 
   const data = (await response.json()) as CreateBookingResponse;
@@ -214,6 +216,113 @@ export async function createBookingClient(
       success: false,
       statusCode: data.statusCode ?? response.status,
       message: data.message ?? "Failed to create booking",
+      error: data.error,
+    };
+  }
+
+  return data;
+}
+
+export interface ConfirmBookingEntry {
+  paymentStatus?: string;
+  status?: string;
+  checkInDate?: string;
+  checkOutDate?: string;
+  roomSnapshot?: {
+    title?: string;
+  };
+}
+
+export interface ConfirmBookingData {
+  isPaid?: boolean;
+  status?: string;
+  bookingReference?: string;
+  bookings?: ConfirmBookingEntry[];
+}
+
+export interface ConfirmBookingResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data?: ConfirmBookingData;
+  error?: string | null;
+}
+
+export type BookingConfirmUiState = "success" | "failed" | "pending" | "error";
+
+export function resolveBookingConfirmState(
+  data: ConfirmBookingData | undefined
+): BookingConfirmUiState {
+  if (!data) return "error";
+
+  if (data.isPaid === true) return "success";
+
+  const booking = data.bookings?.[0];
+
+  if (
+    booking?.paymentStatus === "paid" &&
+    booking?.status === "Confirmed"
+  ) {
+    return "success";
+  }
+
+  if (
+    data.isPaid === false &&
+    (data.status === "Failed" || booking?.paymentStatus === "failed")
+  ) {
+    return "failed";
+  }
+
+  if (
+    data.isPaid === false &&
+    (data.status === "Pending" ||
+      data.status === "Unpaid" ||
+      booking?.paymentStatus === "pending")
+  ) {
+    return "pending";
+  }
+
+  return "error";
+}
+
+export async function confirmBooking(
+  reference: string
+): Promise<ConfirmBookingResponse> {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetchBackend(
+    `${baseUrl}/api/v1/booking/confirm?reference=${encodeURIComponent(reference)}`,
+    { cache: "no-store" }
+  );
+
+  const data = (await response.json()) as ConfirmBookingResponse;
+
+  if (!response.ok) {
+    return {
+      success: false,
+      statusCode: data.statusCode ?? response.status,
+      message: data.message ?? "Failed to confirm booking",
+      error: data.error,
+    };
+  }
+
+  return data;
+}
+
+export async function confirmBookingClient(
+  reference: string
+): Promise<ConfirmBookingResponse> {
+  const response = await fetch(
+    `/api/booking/confirm?reference=${encodeURIComponent(reference)}`,
+    { cache: "no-store" }
+  );
+
+  const data = (await response.json()) as ConfirmBookingResponse;
+
+  if (!response.ok) {
+    return {
+      success: false,
+      statusCode: data.statusCode ?? response.status,
+      message: data.message ?? "Failed to confirm booking",
       error: data.error,
     };
   }
