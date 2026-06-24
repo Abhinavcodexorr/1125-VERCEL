@@ -393,7 +393,7 @@ function PaymentCheckoutInner({
                   setFirstName(e.target.value);
                   clearFieldError("firstName");
                 }}
-                placeholder="John"
+                placeholder="First name"
                 autoComplete="given-name"
                 aria-invalid={Boolean(fieldErrors.firstName)}
                 aria-describedby={fieldErrors.firstName ? "guest-first-name-error" : undefined}
@@ -417,7 +417,7 @@ function PaymentCheckoutInner({
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                placeholder="Kofi"
+                placeholder="Last name"
                 autoComplete="family-name"
                 className="border border-[#E5D7D7] focus:border-gray-400 outline-none rounded-xl px-4 py-3 text-[16px] font-[400] text-[#2C2422] bg-[#FFFEF8] transition-all font-jako-bold"
               />
@@ -438,7 +438,7 @@ function PaymentCheckoutInner({
                   setEmail(e.target.value);
                   clearFieldError("email");
                 }}
-                placeholder="john@example.com"
+                placeholder="Email address"
                 autoComplete="email"
                 aria-invalid={Boolean(fieldErrors.email)}
                 aria-describedby={fieldErrors.email ? "guest-email-error" : undefined}
@@ -485,7 +485,7 @@ function PaymentCheckoutInner({
                     setMobileNumber(sanitizeMobileInput(e.target.value));
                     clearFieldError("mobileNumber");
                   }}
-                  placeholder="241234567"
+                  placeholder="Mobile number"
                   autoComplete="tel-national"
                   maxLength={10}
                   aria-invalid={Boolean(fieldErrors.mobileNumber)}
