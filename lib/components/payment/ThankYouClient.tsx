@@ -50,6 +50,14 @@ function clearStoredReference() {
   }
 }
 
+function clearStoredGuestDetails() {
+  try {
+    sessionStorage.removeItem("1125_guestDetails");
+  } catch {
+    // ignore storage errors
+  }
+}
+
 function Spinner({ className = "border-[#66839C]" }: { className?: string }) {
   return (
     <div
@@ -79,6 +87,7 @@ function ThankYouContentInner() {
       }
       if (state === "success") {
         clearStoredCartId();
+        clearStoredGuestDetails();
       }
       if (data !== undefined) {
         setConfirmData(data);

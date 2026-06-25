@@ -92,9 +92,7 @@ export function getPrimaryRoomTitle(cart: CartData): string {
 
 export function getPrimaryRoomDetailHref(cart: CartData | null | undefined): string {
   const slug = cart?.items[0]?.roomSnapshot.slug?.trim();
-  const base = slug ? `/accommodations/${slug}` : "/accommodations";
-  const cartId = cart?.cartId?.trim();
-  return cartId ? `${base}?cartId=${encodeURIComponent(cartId)}` : base;
+  return slug ? `/accommodations/${slug}` : "/accommodations";
 }
 
 export function getItemLineTotal(item: CartItem): number {

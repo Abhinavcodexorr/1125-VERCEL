@@ -26,6 +26,8 @@ import { isRemoteImage } from "@/lib/utils/image";
 
 type CartStatus = "loading" | "empty" | "expired" | "error" | "ready";
 
+const GUEST_DETAILS_STORAGE_KEY = "1125_guestDetails";
+
 function sanitizeMobileInput(value: string): string {
   return value.replace(/\D/g, "").slice(0, 10);
 }
@@ -248,6 +250,50 @@ function PaymentCheckoutInner({
   const [countryCode, setCountryCode] = useState("233");
   const [specialRequests, setSpecialRequests] = useState("");
   const [fieldErrors, setFieldErrors] = useState<GuestFieldErrors>({});
+
+  // Restore guest details typed before redirecting to Hubtel, so coming back
+  // (which reloads the page) doesn't wipe the form.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(GUEST_DETAILS_STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as Partial<{
+        firstName: string;
+        lastName: string;
+        email: string;
+        mobileNumber: string;
+        countryCode: string;
+        specialRequests: string;
+      }>;
+      if (saved.firstName) setFirstName(saved.firstName);
+      if (saved.lastName) setLastName(saved.lastName);
+      if (saved.email) setEmail(saved.email);
+      if (saved.mobileNumber) setMobileNumber(saved.mobileNumber);
+      if (saved.countryCode) setCountryCode(saved.countryCode);
+      if (saved.specialRequests) setSpecialRequests(saved.specialRequests);
+    } catch {
+      // ignore storage/parse errors
+    }
+  }, []);
+
+  // Keep the saved copy in sync as the guest types.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        GUEST_DETAILS_STORAGE_KEY,
+        JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          mobileNumber,
+          countryCode,
+          specialRequests,
+        })
+      );
+    } catch {
+      // ignore storage errors
+    }
+  }, [firstName, lastName, email, mobileNumber, countryCode, specialRequests]);
 
   const clearFieldError = (field: keyof GuestFieldErrors) => {
     setFieldErrors((prev) => {
@@ -681,37 +727,36 @@ function PaymentCheckoutInner({
           {payLabel}
         </button>
 
-        <p className="text-center text-[13px] text-[#444444] mt-5 tracking-wide font-jako-bold flex items-center justify-center gap-1 font-[400]">
-          <span>
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clipPath="url(#clip0_1_3929)">
-                <path
-                  d="M9.5 5.5H2.5C1.94772 5.5 1.5 5.94772 1.5 6.5V10C1.5 10.5523 1.94772 11 2.5 11H9.5C10.0523 11 10.5 10.5523 10.5 10V6.5C10.5 5.94772 10.0523 5.5 9.5 5.5Z"
-                  stroke="#444444"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M3.5 5.5V3.5C3.5 2.83696 3.76339 2.20107 4.23223 1.73223C4.70107 1.26339 5.33696 1 6 1C6.66304 1 7.29893 1.26339 7.76777 1.73223C8.23661 2.20107 8.5 2.83696 8.5 3.5V5.5"
-                  stroke="#444444"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_1_3929">
-                  <rect width="12" height="12" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
-          </span>
-          Payments are secure and encrypted.
+        <p className="text-center text-[13px] leading-none text-[#444444] mt-5 tracking-wide font-jako-bold flex items-center justify-center gap-1.5 font-[400]">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 12 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="block shrink-0"
+          >
+            <g clipPath="url(#clip0_1_3929)">
+              <path
+                d="M9.5 5.5H2.5C1.94772 5.5 1.5 5.94772 1.5 6.5V10C1.5 10.5523 1.94772 11 2.5 11H9.5C10.0523 11 10.5 10.5523 10.5 10V6.5C10.5 5.94772 10.0523 5.5 9.5 5.5Z"
+                stroke="#444444"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M3.5 5.5V3.5C3.5 2.83696 3.76339 2.20107 4.23223 1.73223C4.70107 1.26339 5.33696 1 6 1C6.66304 1 7.29893 1.26339 7.76777 1.73223C8.23661 2.20107 8.5 2.83696 8.5 3.5V5.5"
+                stroke="#444444"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_1_3929">
+                <rect width="12" height="12" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+          <span className="leading-none">Payments are secure and encrypted.</span>
         </p>
       </div>
     </div>
