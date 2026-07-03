@@ -2,6 +2,7 @@ import { cache } from "react";
 import { getApiBaseUrl } from "./config";
 import { fetchBackend } from "./fetchBackend";
 import { accommodations } from "@/lib/data/accommodations";
+import { formatListingPrice } from "@/lib/utils/cartDisplay";
 import type { TourItem } from "@/lib/data/tours";
 
 export interface RoomAmenity {
@@ -84,6 +85,10 @@ export interface RoomAvailability {
   maxSelectableQuantity: number;
   nights: number;
   subTotal: number;
+  wdNights?: number;
+  weNights?: number;
+  wdPrice?: number;
+  wePrice?: number;
   avgPricePerNight?: number;
   nightBreakdown?: RoomNightBreakdown[];
   maxTotalGuests?: number;
@@ -472,7 +477,7 @@ export function mapRoomToAccommodationListing(room: Room): AccommodationListing 
     type: room.type?.trim() || "",
     title: room.title?.trim() || room.name?.trim() || "",
     price: room.price,
-    formattedPrice: room.formattedPrice,
+    formattedPrice: formatListingPrice(room.price, room.currencySymbol),
     guests: room.guests,
     area: room.size,
     areaUnit: room.unit,

@@ -1,6 +1,13 @@
 import { accommodations } from "@/lib/data/accommodations";
 import type { CartData, CartItem } from "@/lib/api/cart";
 import { getHighestPerNightRate } from "@/lib/api/rooms";
+import {
+  formatDayTypeNightLabel,
+  getCartItemPriceLines,
+  type CartPriceLine,
+} from "@/lib/utils/cartPricing";
+
+export { formatDayTypeNightLabel, getCartItemPriceLines, type CartPriceLine };
 
 const LEGACY_SLUG_MAP: Record<string, string> = {
   "the-villa": "5-bedroom-beach-house",
@@ -56,6 +63,10 @@ export function formatCartDateRange(checkIn: string, checkOut: string): string {
   return `${startFmt} - ${endFmt}`;
 }
 
+export function formatCartNights(nights: number): string {
+  return `${nights} ${nights === 1 ? "night" : "nights"}`;
+}
+
 export function formatGuests(item: CartItem): string {
   const parts = [
     `${item.adults} ${item.adults === 1 ? "Adult" : "Adults"}`,
@@ -87,6 +98,20 @@ export function formatMoney(amount: number, currency: string): string {
   }
 }
 
+/** Listing cards — commas, no .00 for whole amounts. */
+export function formatListingPrice(
+  amount: number,
+  currencySymbol: string
+): string {
+  const hasFraction = Math.abs(amount % 1) > Number.EPSILON;
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: hasFraction ? 2 : 0,
+  }).format(amount);
+
+  return `${currencySymbol} ${formatted}/night`;
+}
+
 export function getPrimaryRoomTitle(cart: CartData): string {
   return cart.items[0]?.roomSnapshot.title ?? "your stay";
 }
@@ -98,6 +123,17 @@ export function getPrimaryRoomDetailHref(cart: CartData | null | undefined): str
 
 export function getItemLineTotal(item: CartItem): number {
   return item.subTotal ?? item.pricePerNight * item.nights * item.quantity;
+}
+
+/** Payment summary — commas, no .00 for whole amounts. */
+export function formatPaymentMoney(amount: number, currency: string): string {
+  const hasFraction = Math.abs(amount % 1) > Number.EPSILON;
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: hasFraction ? 2 : 0,
+  }).format(amount);
+
+  return `${currency} ${formatted}`;
 }
 
 /** Per-night label price — highest wd/we or nightly rate, not an average. */

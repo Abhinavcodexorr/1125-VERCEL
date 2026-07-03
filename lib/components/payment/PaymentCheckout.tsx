@@ -14,12 +14,13 @@ import {
 } from "@/lib/api/booking";
 import {
   formatCartDateRange,
+  formatCartNights,
+  formatDayTypeNightLabel,
   formatGuests,
-  formatMoney,
+  formatPaymentMoney,
   getCartItemImage,
   getCartItemImageAlt,
-  getCartItemDisplayPricePerNight,
-  getItemLineTotal,
+  getCartItemPriceLines,
   getPrimaryRoomTitle,
   getPrimaryRoomDetailHref,
 } from "@/lib/utils/cartDisplay";
@@ -186,7 +187,10 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
                 {item.roomSnapshot.title}
               </h4>
               <p className="text-[14px] font-[400] text-[#5A4F4D] mt-1 font-jako-regular">
-                {formatCartDateRange(item.checkInDate, item.checkOutDate)}
+                {formatCartDateRange(item.checkInDate, item.checkOutDate)}{" "}
+                <span className="font-jako-bold text-[#2C2422]">
+                  ({formatCartNights(item.nights)})
+                </span>
               </p>
               <p className="text-[14px] font-[400] text-[#5A4F4D] mt-0.5 font-jako-regular">
                 {formatGuests(item)}
@@ -202,19 +206,34 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
       </div>
 
       <div className="border-t border-[#D5C2C2] pt-5 space-y-3.5 text-xs">
-        {cart.items.map((item) => (
-          <div key={`${item._id}-price`} className="flex justify-between gap-3">
-            <span className="font-jako-regular font-[400] text-[14px] text-[#2C2422]">
-              {formatMoney(getCartItemDisplayPricePerNight(item), item.currency)} x{" "}
-              {item.nights}{" "}
-              {item.nights === 1 ? "night" : "nights"}
-              {item.quantity > 1 ? ` x ${item.quantity}` : ""}
-            </span>
-            <span className="font-[400] text-[14px] text-[#2C2422] font-jako-regular shrink-0">
-              {formatMoney(getItemLineTotal(item), item.currency)}
-            </span>
-          </div>
-        ))}
+        {cart.items.flatMap((item) => {
+          const priceLines = getCartItemPriceLines(item);
+          const hasTypedLines = priceLines.some(
+            (line) => line.dayType === "weekday" || line.dayType === "weekend"
+          );
+          const displayLines = hasTypedLines
+            ? priceLines.filter((line) => line.dayType !== "other")
+            : priceLines;
+
+          return displayLines.map((line, index) => (
+            <div
+              key={`${item._id}-${line.dayType}-${line.rate}-${index}`}
+              className="flex justify-between gap-3"
+            >
+              <span className="font-jako-regular font-[400] text-[14px] text-[#2C2422]">
+                <span className="font-jako-bold">
+                  {formatPaymentMoney(line.rate, item.currency)}
+                </span>{" "}
+                x {line.nights}{" "}
+                {formatDayTypeNightLabel(line.dayType, line.nights)}
+                {item.quantity > 1 ? ` x ${item.quantity} units` : ""}
+              </span>
+              <span className="text-[14px] text-[#2C2422] font-jako-bold shrink-0">
+                {formatPaymentMoney(line.total, item.currency)}
+              </span>
+            </div>
+          ));
+        })}
       </div>
 
       <div className="border-t border-[#D5C2C2] mt-5 pt-5 flex justify-between items-center text-sm font-bold text-[#2C2422]">
@@ -222,7 +241,7 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
           Total
         </span>
         <span className="text-[18px] font-[400] text-[#2C2422] font-jako-bold">
-          {formatMoney(cart.subTotal, cart.currency)}
+          {formatPaymentMoney(cart.subTotal, cart.currency)}
         </span>
       </div>
     </div>
@@ -511,7 +530,7 @@ function PaymentCheckoutInner({
   const payLabel = cart
     ? isSubmitting
       ? "Redirecting..."
-      : `Pay ${formatMoney(cart.subTotal, cart.currency)}`
+      : `Pay ${formatPaymentMoney(cart.subTotal, cart.currency)}`
     : "Pay Now";
   const canPay = Boolean(
     cartStatus === "ready" &&

@@ -1,5 +1,6 @@
 import { getApiBaseUrl } from "./config";
 import { fetchBackend } from "./fetchBackend";
+import { fetchRoomQuoteClientShared } from "./rooms";
 
 export interface AddToCartPayload {
   roomId: string;
@@ -48,6 +49,15 @@ export interface CartNightBreakdown {
   price?: number;
 }
 
+type CartPricingFields = {
+  nightBreakdown?: CartNightBreakdown[];
+  wdNights?: number;
+  weNights?: number;
+  wdPrice?: number;
+  wePrice?: number;
+  subTotal?: number;
+};
+
 export interface CartItem {
   _id: string;
   roomId: string;
@@ -61,10 +71,14 @@ export interface CartItem {
   pricePerNight: number;
   wdPrice?: number;
   wePrice?: number;
+  wdNights?: number;
+  weNights?: number;
   nightBreakdown?: CartNightBreakdown[];
   subTotal?: number;
   currency: string;
   isAvailable: boolean;
+  availability?: CartPricingFields;
+  pricing?: CartPricingFields;
 }
 
 export interface CartData {
@@ -112,6 +126,26 @@ export function validateCartPayload(
     return "quantity must be at least 1 when provided (only for rooms with multiple units)";
   }
   return null;
+}
+
+function normalizeCartItemPricing(item: CartItem): CartItem {
+  const nested = item.availability ?? item.pricing;
+
+  return {
+    ...item,
+    nightBreakdown: item.nightBreakdown ?? nested?.nightBreakdown,
+    wdNights: item.wdNights ?? nested?.wdNights,
+    weNights: item.weNights ?? nested?.weNights,
+    wdPrice:
+      item.wdPrice ??
+      nested?.wdPrice ??
+      item.roomSnapshot.wdPrice,
+    wePrice:
+      item.wePrice ??
+      nested?.wePrice ??
+      item.roomSnapshot.wePrice,
+    subTotal: item.subTotal ?? nested?.subTotal,
+  };
 }
 
 export async function addToCart(
@@ -183,6 +217,46 @@ export async function getCart(cartId: string): Promise<GetCartResponse> {
   return data;
 }
 
+/** Always fetch room quote so weekday/weekend lines are available on payment. */
+export async function enrichCartWithRoomPricing(
+  cart: CartData
+): Promise<CartData> {
+  const items = await Promise.all(
+    cart.items.map(async (item) => {
+      const normalized = normalizeCartItemPricing(item);
+
+      try {
+        const idOrSlug = normalized.roomId || normalized.roomSnapshot.slug;
+        const quote = await fetchRoomQuoteClientShared(idOrSlug, {
+          checkInDate: normalized.checkInDate,
+          checkOutDate: normalized.checkOutDate,
+          adults: normalized.adults,
+        });
+
+        const availability = quote?.availability;
+        if (!quote || !availability) {
+          return normalized;
+        }
+
+        return normalizeCartItemPricing({
+          ...normalized,
+          wdPrice: availability.wdPrice ?? quote.wdPrice ?? normalized.wdPrice,
+          wePrice: availability.wePrice ?? quote.wePrice ?? normalized.wePrice,
+          wdNights: availability.wdNights ?? normalized.wdNights,
+          weNights: availability.weNights ?? normalized.weNights,
+          nightBreakdown:
+            availability.nightBreakdown ?? normalized.nightBreakdown,
+          subTotal: normalized.subTotal ?? availability.subTotal ?? cart.subTotal,
+        });
+      } catch {
+        return normalized;
+      }
+    })
+  );
+
+  return { ...cart, items };
+}
+
 export async function getCartClient(cartId: string): Promise<GetCartResponse> {
   const response = await fetch(`/api/cart/${encodeURIComponent(cartId)}`, {
     cache: "no-store",
@@ -197,6 +271,10 @@ export async function getCartClient(cartId: string): Promise<GetCartResponse> {
       message: data.message ?? "Failed to retrieve cart",
       error: data.error,
     };
+  }
+
+  if (data.success && data.data) {
+    data.data = await enrichCartWithRoomPricing(data.data);
   }
 
   return data;
