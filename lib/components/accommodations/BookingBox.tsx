@@ -19,6 +19,7 @@ export interface BookingBoxHandle {
 interface BookingBoxProps {
     showQuantity?: boolean;
     maxQuantity?: number;
+    maxTotalGuests?: number;
     initialSelection?: Partial<BookingSelection>;
     onSelectionChange?: (selection: BookingSelection) => void;
 }
@@ -63,7 +64,7 @@ function parseBookingDate(value: string): Date | null {
 
 // Prop add kiya hai showQuantity taaki sirf Chalets mein dikhe
 const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function BookingBox(
-    { showQuantity = false, maxQuantity, initialSelection, onSelectionChange },
+    { showQuantity = false, maxQuantity, maxTotalGuests, initialSelection, onSelectionChange },
     ref
 ) {
     const [checkIn, setCheckIn] = useState<Date | null>(() => {
@@ -106,6 +107,19 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
         });
     }, [checkIn, checkOut, adults, children, quantity, onSelectionChange]);
 
+    const quantityCap =
+        maxQuantity !== undefined && maxQuantity > 0 ? maxQuantity : undefined;
+
+    const guestCap =
+        maxTotalGuests !== undefined && maxTotalGuests > 0
+            ? maxTotalGuests
+            : undefined;
+
+    const canAddAdult =
+        guestCap === undefined || adults + 1 + children <= guestCap;
+    const canAddChild =
+        guestCap === undefined || adults + children + 1 <= guestCap;
+
     useEffect(() => {
         if (maxQuantity === undefined || maxQuantity < 1) return;
         if (quantity > maxQuantity) {
@@ -113,8 +127,22 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
         }
     }, [maxQuantity, quantity]);
 
-    const quantityCap =
-        maxQuantity !== undefined && maxQuantity > 0 ? maxQuantity : undefined;
+    useEffect(() => {
+        if (guestCap === undefined) return;
+
+        if (adults + children > guestCap) {
+            const nextChildren = Math.max(0, guestCap - adults);
+            if (nextChildren !== children) {
+                setChildren(nextChildren);
+                return;
+            }
+
+            const nextAdults = Math.max(1, guestCap - children);
+            if (nextAdults !== adults) {
+                setAdults(nextAdults);
+            }
+        }
+    }, [guestCap, adults, children]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -253,7 +281,7 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
                                     <path d="M1 6H11" stroke="#AF2F2C" strokeWidth="2" />
                                 </svg></button>
                                 <span className="text-[14px] font-jako-bold min-w-[20px] text-center">{adults}</span>
-                                <button type="button" onClick={() => setAdults(adults + 1)} className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer text-[#BC2623] hover:bg-gray-50 font-bold"><svg width="12" height="12" viewBox="0 0 12 12">
+                                <button type="button" onClick={() => setAdults(adults + 1)} disabled={!canAddAdult} className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer text-[#BC2623] hover:bg-gray-50 disabled:opacity-40 font-bold"><svg width="12" height="12" viewBox="0 0 12 12">
                                     <path d="M1 6H11M6 1V11" stroke="#AF2F2C" strokeWidth="2" />
                                 </svg></button>
                             </div>
@@ -269,7 +297,7 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
                                     <path d="M1 6H11" stroke="#AF2F2C" strokeWidth="2" />
                                 </svg></button>
                                 <span className="text-[14px] font-jako-bold min-w-[20px] text-center">{children}</span>
-                                <button type="button" onClick={() => setChildren(children + 1)} className="w-8 h-8 rounded-full border cursor-pointer border-[#D8D0C8] flex items-center justify-center text-[#BC2623] hover:bg-gray-50 font-bold"><svg width="12" height="12" viewBox="0 0 12 12">
+                                <button type="button" onClick={() => setChildren(children + 1)} disabled={!canAddChild} className="w-8 h-8 rounded-full border cursor-pointer border-[#D8D0C8] flex items-center justify-center text-[#BC2623] hover:bg-gray-50 disabled:opacity-40 font-bold"><svg width="12" height="12" viewBox="0 0 12 12">
                                     <path d="M1 6H11M6 1V11" stroke="#AF2F2C" strokeWidth="2" />
                                 </svg></button>
                             </div>

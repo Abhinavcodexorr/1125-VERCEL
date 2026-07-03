@@ -18,6 +18,7 @@ import {
   formatMoney,
   getCartItemImage,
   getCartItemImageAlt,
+  getCartItemDisplayPricePerNight,
   getItemLineTotal,
   getPrimaryRoomTitle,
   getPrimaryRoomDetailHref,
@@ -204,7 +205,8 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
         {cart.items.map((item) => (
           <div key={`${item._id}-price`} className="flex justify-between gap-3">
             <span className="font-jako-regular font-[400] text-[14px] text-[#2C2422]">
-              {formatMoney(item.pricePerNight, item.currency)} x {item.nights}{" "}
+              {formatMoney(getCartItemDisplayPricePerNight(item), item.currency)} x{" "}
+              {item.nights}{" "}
               {item.nights === 1 ? "night" : "nights"}
               {item.quantity > 1 ? ` x ${item.quantity}` : ""}
             </span>

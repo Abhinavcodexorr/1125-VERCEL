@@ -17,6 +17,63 @@ export interface RoomImage {
   order: number;
 }
 
+export interface RoomNightBreakdown {
+  date: string;
+  day?: string;
+  dayType?: string;
+  rate?: number;
+  /** @deprecated API returns `rate` — kept for backward compatibility */
+  price?: number;
+  rateType?: string;
+}
+
+export function getNightRateValue(night: {
+  rate?: number;
+  price?: number;
+}): number | null {
+  const value = night.rate ?? night.price;
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+/** Highest per-night rate from breakdown or wd/we — never an average. */
+export function getHighestPerNightRate(options: {
+  nightBreakdown?: RoomNightBreakdown[];
+  wdPrice?: number;
+  wePrice?: number;
+  pricePerNight?: number;
+  fallback?: number;
+}): number {
+  const breakdownRates = (options.nightBreakdown ?? [])
+    .map(getNightRateValue)
+    .filter((value): value is number => value !== null);
+
+  if (breakdownRates.length > 0) {
+    return Math.max(...breakdownRates);
+  }
+
+  const wd =
+    typeof options.wdPrice === "number" && Number.isFinite(options.wdPrice)
+      ? options.wdPrice
+      : null;
+  const we =
+    typeof options.wePrice === "number" && Number.isFinite(options.wePrice)
+      ? options.wePrice
+      : null;
+
+  if (wd !== null && we !== null) return Math.max(wd, we);
+  if (wd !== null) return wd;
+  if (we !== null) return we;
+
+  if (
+    typeof options.pricePerNight === "number" &&
+    Number.isFinite(options.pricePerNight)
+  ) {
+    return options.pricePerNight;
+  }
+
+  return options.fallback ?? 0;
+}
+
 export interface RoomAvailability {
   isAvailable: boolean;
   quantity: number;
@@ -27,6 +84,19 @@ export interface RoomAvailability {
   maxSelectableQuantity: number;
   nights: number;
   subTotal: number;
+  avgPricePerNight?: number;
+  nightBreakdown?: RoomNightBreakdown[];
+  maxTotalGuests?: number;
+}
+
+export interface RoomQuote {
+  wdPrice: number;
+  wePrice: number;
+  /** Current check-in day rate from GET /rooms/:id */
+  pricePerNight: number;
+  currency: string;
+  currencySymbol: string;
+  availability: RoomAvailability | null;
 }
 
 export interface Room {
@@ -40,6 +110,8 @@ export interface Room {
   unit: string;
   pricePerNight: number;
   price: number;
+  wdPrice?: number;
+  wePrice?: number;
   currency: string;
   currencySymbol: string;
   formattedPrice: string;
@@ -260,40 +332,52 @@ export async function fetchRoomBySlugClient(
   return json.success ? json.data : null;
 }
 
-const availabilityInFlight = new Map<string, Promise<RoomAvailability | null>>();
+const availabilityInFlight = new Map<string, Promise<Room | null>>();
 const availabilityCache = new Map<
   string,
-  { fetchedAt: number; data: RoomAvailability | null }
+  { fetchedAt: number; data: Room | null }
 >();
 const AVAILABILITY_CACHE_MS = 15_000;
 
 function availabilityRequestKey(
   idOrSlug: string,
-  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate">
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
 ): string {
-  return `${idOrSlug}|${query.checkInDate}|${query.checkOutDate}`;
+  return `${idOrSlug}|${query.checkInDate}|${query.checkOutDate}|${query.adults ?? ""}`;
 }
 
-/** Dedupes identical availability requests (e.g. desktop + mobile booking panels). */
-export async function fetchRoomAvailabilityClientShared(
+function mapRoomToQuote(room: Room | null): RoomQuote | null {
+  if (!room) return null;
+
+  return {
+    wdPrice: room.wdPrice ?? room.pricePerNight,
+    wePrice: room.wePrice ?? room.pricePerNight,
+    pricePerNight: room.pricePerNight,
+    currency: room.currency,
+    currencySymbol: room.currencySymbol,
+    availability: room.availability ?? null,
+  };
+}
+
+/** Dedupes identical quote requests (e.g. desktop + mobile booking panels). */
+export async function fetchRoomQuoteClientShared(
   idOrSlug: string,
   query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
-): Promise<RoomAvailability | null> {
+): Promise<RoomQuote | null> {
   if (!query.checkInDate || !query.checkOutDate) return null;
 
   const key = availabilityRequestKey(idOrSlug, query);
   const cached = availabilityCache.get(key);
   if (cached && Date.now() - cached.fetchedAt < AVAILABILITY_CACHE_MS) {
-    return cached.data;
+    return mapRoomToQuote(cached.data as Room | null);
   }
 
   let pending = availabilityInFlight.get(key);
   if (!pending) {
     pending = fetchRoomBySlugClient(idOrSlug, query)
-      .then((room) => room?.availability ?? null)
-      .then((data) => {
-        availabilityCache.set(key, { fetchedAt: Date.now(), data });
-        return data;
+      .then((room) => {
+        availabilityCache.set(key, { fetchedAt: Date.now(), data: room });
+        return room;
       })
       .finally(() => {
         availabilityInFlight.delete(key);
@@ -301,7 +385,17 @@ export async function fetchRoomAvailabilityClientShared(
     availabilityInFlight.set(key, pending);
   }
 
-  return pending;
+  const room = await pending;
+  return mapRoomToQuote(room);
+}
+
+/** @deprecated Use fetchRoomQuoteClientShared — returns availability only. */
+export async function fetchRoomAvailabilityClientShared(
+  idOrSlug: string,
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
+): Promise<RoomAvailability | null> {
+  const quote = await fetchRoomQuoteClientShared(idOrSlug, query);
+  return quote?.availability ?? null;
 }
 
 /** Live availability fetch (no cache) — used by the room API proxy with stay params. */

@@ -1,5 +1,6 @@
 import { accommodations } from "@/lib/data/accommodations";
 import type { CartData, CartItem } from "@/lib/api/cart";
+import { getHighestPerNightRate } from "@/lib/api/rooms";
 
 const LEGACY_SLUG_MAP: Record<string, string> = {
   "the-villa": "5-bedroom-beach-house",
@@ -97,4 +98,15 @@ export function getPrimaryRoomDetailHref(cart: CartData | null | undefined): str
 
 export function getItemLineTotal(item: CartItem): number {
   return item.subTotal ?? item.pricePerNight * item.nights * item.quantity;
+}
+
+/** Per-night label price — highest wd/we or nightly rate, not an average. */
+export function getCartItemDisplayPricePerNight(item: CartItem): number {
+  return getHighestPerNightRate({
+    nightBreakdown: item.nightBreakdown,
+    wdPrice: item.wdPrice ?? item.roomSnapshot.wdPrice,
+    wePrice: item.wePrice ?? item.roomSnapshot.wePrice,
+    pricePerNight: item.pricePerNight,
+    fallback: item.roomSnapshot.price,
+  });
 }

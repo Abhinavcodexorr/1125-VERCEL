@@ -9,9 +9,9 @@ import BookingBox, {
 import CompleteReservationButton from "@/lib/components/accommodations/CompleteReservationButton";
 import { getCartClient } from "@/lib/api/cart";
 import {
-  fetchRoomAvailabilityClientShared,
+  fetchRoomQuoteClientShared,
   formatAvailabilityLabel,
-  type RoomAvailability,
+  type RoomQuote,
 } from "@/lib/api/rooms";
 
 interface AccommodationBookingPanelProps {
@@ -21,10 +21,11 @@ interface AccommodationBookingPanelProps {
   availabilityUnit?: string;
   /** Live check-in/check-out availability — chalets only. */
   checkAvailability?: boolean;
+  onQuoteChange?: (quote: RoomQuote | null) => void;
 }
 
-function availabilityQueryKey(selection: BookingSelection): string {
-  return `${selection.checkInDate}|${selection.checkOutDate}`;
+function quoteQueryKey(selection: BookingSelection): string {
+  return `${selection.checkInDate}|${selection.checkOutDate}|${selection.adults}`;
 }
 
 function AvailabilityBadge({
@@ -67,6 +68,7 @@ function AccommodationBookingPanelInner({
   totalUnits,
   availabilityUnit = "Chalet",
   checkAvailability = false,
+  onQuoteChange,
 }: AccommodationBookingPanelProps) {
   const searchParams = useSearchParams();
   const cartId = searchParams.get("cartId");
@@ -75,16 +77,14 @@ function AccommodationBookingPanelInner({
   const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
   const showQuantityPickerRef = useRef(totalUnits > 1);
-  const lastAvailabilityQueryRef = useRef<string | null>(null);
+  const lastQuoteQueryRef = useRef<string | null>(null);
 
   const [bookingReady, setBookingReady] = useState(!cartId);
   const [cartSelection, setCartSelection] = useState<
     Partial<BookingSelection> | undefined
   >();
-  const [availability, setAvailability] = useState<RoomAvailability | null>(
-    null
-  );
-  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  const [quote, setQuote] = useState<RoomQuote | null>(null);
+  const [isLoadingQuote, setIsLoadingQuote] = useState(false);
 
   useEffect(() => {
     if (!cartId) return;
@@ -126,16 +126,15 @@ function AccommodationBookingPanelInner({
     };
   }, [cartId, roomId]);
 
-  const refreshAvailability = useCallback(
+  const refreshQuote = useCallback(
     (selection: BookingSelection) => {
-      if (!checkAvailability) return;
       if (!selection.checkInDate || !selection.checkOutDate) return;
 
-      const queryKey = availabilityQueryKey(selection);
-      if (lastAvailabilityQueryRef.current === queryKey) {
+      const queryKey = quoteQueryKey(selection);
+      if (lastQuoteQueryRef.current === queryKey) {
         return;
       }
-      lastAvailabilityQueryRef.current = queryKey;
+      lastQuoteQueryRef.current = queryKey;
 
       if (fetchTimerRef.current) {
         clearTimeout(fetchTimerRef.current);
@@ -143,38 +142,36 @@ function AccommodationBookingPanelInner({
 
       fetchTimerRef.current = setTimeout(async () => {
         const requestId = ++requestIdRef.current;
-        setIsLoadingAvailability(true);
+        setIsLoadingQuote(true);
 
         try {
-          const availabilityResult = await fetchRoomAvailabilityClientShared(
-            roomId,
-            {
-              checkInDate: selection.checkInDate,
-              checkOutDate: selection.checkOutDate,
-              adults: selection.adults,
-            }
-          );
+          const quoteResult = await fetchRoomQuoteClientShared(roomId, {
+            checkInDate: selection.checkInDate,
+            checkOutDate: selection.checkOutDate,
+            adults: selection.adults,
+          });
 
           if (requestId !== requestIdRef.current) return;
 
-          if (availabilityResult) {
-            setAvailability(availabilityResult);
+          setQuote(quoteResult);
+          onQuoteChange?.(quoteResult);
+
+          if (quoteResult?.availability) {
             showQuantityPickerRef.current =
-              availabilityResult.showQuantityPicker;
-          } else {
-            setAvailability(null);
+              quoteResult.availability.showQuantityPicker;
           }
         } catch {
           if (requestId !== requestIdRef.current) return;
-          setAvailability(null);
+          setQuote(null);
+          onQuoteChange?.(null);
         } finally {
           if (requestId === requestIdRef.current) {
-            setIsLoadingAvailability(false);
+            setIsLoadingQuote(false);
           }
         }
       }, 350);
     },
-    [checkAvailability, roomId]
+    [onQuoteChange, roomId]
   );
 
   useEffect(() => {
@@ -184,6 +181,8 @@ function AccommodationBookingPanelInner({
       }
     };
   }, []);
+
+  const availability = quote?.availability ?? null;
 
   const showQuantityPicker = checkAvailability
     ? availability
@@ -196,11 +195,14 @@ function AccommodationBookingPanelInner({
   const availableUnits = availability?.availableUnits ?? 0;
   const isAvailable = availability?.isAvailable ?? false;
   const maxSelectableQuantity = availability?.maxSelectableQuantity ?? 0;
+  const maxTotalGuests = availability?.maxTotalGuests;
 
-  const availabilityLabel = formatAvailabilityLabel(
-    availableUnits,
-    availabilityUnit
-  );
+  const availabilityLabel =
+    checkAvailability && showQuantityPicker
+      ? formatAvailabilityLabel(availableUnits, availabilityUnit)
+      : isAvailable
+        ? "Available"
+        : "Not available";
 
   const maxQuantity =
     checkAvailability && showQuantityPicker && maxSelectableQuantity > 0
@@ -208,13 +210,13 @@ function AccommodationBookingPanelInner({
       : undefined;
 
   const canReserve = checkAvailability
-    ? Boolean(availability?.isAvailable) && !isLoadingAvailability
-    : true;
+    ? Boolean(availability?.isAvailable) && !isLoadingQuote
+    : Boolean(!availability || availability.isAvailable) && !isLoadingQuote;
 
   if (!bookingReady) {
     return (
       <>
-        {checkAvailability && totalUnits > 1 && (
+        {showAvailabilityBadge && (
           <AvailabilityBadge
             label={availabilityLabel}
             isLoading
@@ -243,7 +245,7 @@ function AccommodationBookingPanelInner({
       {showAvailabilityBadge && (
         <AvailabilityBadge
           label={availabilityLabel}
-          isLoading={isLoadingAvailability || !availability}
+          isLoading={isLoadingQuote || !availability}
           isAvailable={isAvailable}
         />
       )}
@@ -252,8 +254,9 @@ function AccommodationBookingPanelInner({
         ref={bookingRef}
         showQuantity={showQuantityPicker}
         maxQuantity={maxQuantity}
+        maxTotalGuests={maxTotalGuests}
         initialSelection={cartSelection}
-        onSelectionChange={refreshAvailability}
+        onSelectionChange={refreshQuote}
       />
 
       <CompleteReservationButton

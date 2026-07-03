@@ -2,13 +2,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AccommodationBookingPanel from "@/lib/components/accommodations/AccommodationBookingPanel";
+import AccommodationDetailContent from "@/lib/components/accommodations/AccommodationDetailContent";
 import AmenityList from "@/lib/components/accommodations/AmenityList";
-import RoomImageGallery from "@/lib/components/accommodations/RoomImageGallery";
 import {
     fetchRoomBySlug,
     fetchRooms,
     buildAccommodationTabs,
+    getHighestPerNightRate,
     getRoomDisplayTitle,
     getRoomDisplayType,
     mapRoomToPageData,
@@ -109,42 +109,23 @@ export default async function AccommodationDetailPage({
 
             <section className="max-w-[1440px] mx-auto relative z-20 px-6 lg:px-12 pb-20">
                 <div className="bg-white rounded-3xl sm:rounded-t-none sm:rounded-tr-3xl sm:rounded-b-3xl shadow-xl border border-[#ebe5dd] p-6 md:p-10">
-                    <div className="grid lg:grid-cols-12 gap-10 items-start">
-                        {/* LEFT COLUMN */}
-                        <div className="w-full lg:col-span-5 shrink-0">
-                            <RoomImageGallery
-                                image={room.image}
-                                galleryImages={room.galleryImages}
-                                title={displayType}
-                                currencySymbol={room.currencySymbol}
-                                price={room.price}
-                            />
-                        </div>
-
-                        {/* RIGHT COLUMN */}
-                        <div className="w-full lg:col-span-7 flex flex-col justify-between min-h-[440px] pt-2">
-                            <div>
-                                <h2 className="font-ogg-regular text-[#7CA5C8] text-[38px] font-[500] lg:text-[38px] leading-tight ">
-                                    {displayType}
-                                </h2>
-                                <p className="mt-4 text-[#242424] text-[16px] font-[400] leading-relaxed max-w-[540px] font-jako-regular">
-                                    {room.description || "Experience a sanctuary..."}
-                                </p>
-
-                                <AmenityList amenities={room.amenities} />
-                            </div>
-
-                            {/* BOOKING BOX SECTION */}
-                            <div className="w-full max-w-[600px] bg-[#FFFEF8] border border-[#E7DDD4] rounded-[12px] p-[24px] mt-10">
-                                <AccommodationBookingPanel
-                                    roomId={apiRoom._id}
-                                    totalUnits={room.quantity}
-                                    availabilityUnit={availabilityUnit}
-                                    checkAvailability={room.slug === "chalets"}
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    <AccommodationDetailContent
+                        roomId={apiRoom._id}
+                        totalUnits={room.quantity}
+                        availabilityUnit={availabilityUnit}
+                        checkAvailability={room.slug === "chalets"}
+                        displayType={displayType}
+                        description={room.description}
+                        image={room.image}
+                        galleryImages={room.galleryImages}
+                        currencySymbol={room.currencySymbol}
+                        initialPrice={getHighestPerNightRate({
+                            wdPrice: apiRoom.wdPrice,
+                            wePrice: apiRoom.wePrice,
+                            pricePerNight: apiRoom.pricePerNight,
+                        })}
+                        amenities={<AmenityList amenities={room.amenities} />}
+                    />
                 </div>
             </section>
         </main>

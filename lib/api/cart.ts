@@ -32,10 +32,20 @@ export interface CartRoomSnapshot {
   slug: string;
   type: string;
   price: number;
+  wdPrice?: number;
+  wePrice?: number;
   currency: string;
   guests: number;
   quantity: number;
   images?: CartRoomImage[];
+}
+
+export interface CartNightBreakdown {
+  date: string;
+  day?: string;
+  dayType?: string;
+  rate?: number;
+  price?: number;
 }
 
 export interface CartItem {
@@ -49,6 +59,9 @@ export interface CartItem {
   quantity: number;
   nights: number;
   pricePerNight: number;
+  wdPrice?: number;
+  wePrice?: number;
+  nightBreakdown?: CartNightBreakdown[];
   subTotal?: number;
   currency: string;
   isAvailable: boolean;
