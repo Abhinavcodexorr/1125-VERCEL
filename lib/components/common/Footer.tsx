@@ -12,9 +12,9 @@ const exploreLinks = [
 const supportLinks = [
   { name: "FAQ", href: "#" },
   { name: "Contact Us", href: "/contact" },
-  { name: "Privacy Policy", href: "#" },
-  { name: "Terms of Use", href: "#" },
-  { name: "Refund Policy", href: "#" },
+  { name: "Privacy Policy", href: "/privacy-policy" },
+  { name: "Terms of Use", href: "/terms-of-use" },
+  { name: "Refund Policy", href: "/refund-policy" },
 ];
 
 export default function Footer() {
@@ -148,10 +148,10 @@ export default function Footer() {
             </p>
 
             <div className="flex gap-8 tracking-wide">
-              <Link href="#" className="hover:text-white transition-colors font-manrope-regular  text-[12px] text-[#FFFEF859] font-[400]">
+              <Link href="/privacy-policy" className="hover:text-white transition-colors font-manrope-regular  text-[12px] text-[#FFFEF859] font-[400]">
                 Privacy
               </Link>
-              <Link href="#" className="hover:text-white transition-colors font-manrope-regular  text-[12px] text-[#FFFEF859] font-[400]">
+              <Link href="/terms-of-use" className="hover:text-white transition-colors font-manrope-regular  text-[12px] text-[#FFFEF859] font-[400]">
                 Terms
               </Link>
             </div>

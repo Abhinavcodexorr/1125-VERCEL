@@ -11,19 +11,17 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
 
-  const hideLayoutPages = ["/payment", "/thank-you"];
+  const hideHeaderPages = ["/payment", "/thank-you"];
+  const hideFooterPages = ["/thank-you"];
 
-  const hideLayout = hideLayoutPages.includes(pathname);
-
-  if (hideLayout) {
-    return <>{children}</>;
-  }
+  const hideHeader = hideHeaderPages.includes(pathname);
+  const hideFooter = hideFooterPages.includes(pathname);
 
   return (
     <>
-      <Header />
+      {!hideHeader && <Header />}
       {children}
-      <Footer />
+      {!hideFooter && <Footer />}
     </>
   );
 }
