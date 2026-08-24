@@ -4,20 +4,43 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-const galleryImages = [   
-    { id: 1, src: "/images/gallery/1.jpg", height: "h-[282px]" },
-    { id: 2, src: "/images/gallery/2.jpg", height: "h-[318px]" },
-    { id: 3, src: "/images/gallery/6.jpg", height: "h-[212px]" },
-    { id: 4, src: "/images/gallery/4.jpg", height: "h-[477px]" },
-    { id: 5, src: "/images/gallery/5.jpg", height: "h-[212px]" },
-    { id: 6, src: "/images/gallery/6.jpg", height: "h-[239px]" },
-    { id: 7, src: "/images/gallery/7.jpg", height: "h-[477px]" },
-    { id: 8, src: "/images/gallery/5.jpg", height: "h-[212px]" },
-    { id: 9, src: "/images/gallery/8.jpg", height: "h-[477px]" },
-    // { id: 10, src: "/images/gallery/9.jpg", height: "h-[212px]" },   
-    { id: 11, src: "/images/gallery/10.jpg", height: "h-[477px]" },
-     { id: 12, src: "/images/gallery/10.jpg", height: "h-[477px]" },
-       { id: 13, src: "/images/gallery/10.jpg", height: "h-[477px]" },
+type GalleryCategory =
+    | "outdoor-pergola"
+    | "deck-events"
+    | "interiors"
+    | "pool-beach";
+
+const galleryImages: {
+    id: number;
+    src: string;
+    category: GalleryCategory;
+    height: string;
+    alt: string;
+}[] = [
+    { id: 1, src: "/images/gallery/outdoor-pergola/pergola-01.jpg", category: "outdoor-pergola", height: "h-[477px]", alt: "Outdoor pergola lounge cabanas" },
+    { id: 2, src: "/images/gallery/outdoor-pergola/pergola-02.jpg", category: "outdoor-pergola", height: "h-[318px]", alt: "Outdoor pergola seating and bar tables" },
+    { id: 3, src: "/images/gallery/deck-events/deck-dining.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck dining table for events" },
+    { id: 4, src: "/images/gallery/deck-events/deck-terrace.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck terrace for events" },
+    { id: 21, src: "/images/gallery/deck-events/deck-01.jpg", category: "deck-events", height: "h-[282px]", alt: "Aerial view of the oceanfront deck" },
+    { id: 22, src: "/images/gallery/deck-events/lounge-01.jpg", category: "deck-events", height: "h-[318px]", alt: "Social lounge and events games room" },
+    { id: 24, src: "/images/gallery/deck-events/lounge-games.jpg", category: "deck-events", height: "h-[318px]", alt: "Events lounge board games" },
+    { id: 5, src: "/images/gallery/pool-beach/aerial-pools.jpg", category: "pool-beach", height: "h-[282px]", alt: "Aerial view of swim-up pools and beach" },
+    { id: 25, src: "/images/gallery/deck-events/deck-01.jpg", category: "pool-beach", height: "h-[282px]", alt: "Aerial view of pools, deck, and beach" },
+    { id: 6, src: "/images/gallery/pool-beach/chalet-ocean.jpg", category: "pool-beach", height: "h-[318px]", alt: "Chalet bedroom opening to pool and ocean" },
+    { id: 7, src: "/images/gallery/interiors/villa-living-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa living room" },
+    { id: 8, src: "/images/gallery/interiors/villa-living-02.jpg", category: "interiors", height: "h-[477px]", alt: "Villa lounge with television wall" },
+    { id: 9, src: "/images/gallery/interiors/dining-kitchen.jpg", category: "interiors", height: "h-[477px]", alt: "Dining area and kitchen" },
+    { id: 10, src: "/images/gallery/interiors/kitchen-bar.jpg", category: "interiors", height: "h-[477px]", alt: "Kitchen breakfast bar" },
+    { id: 11, src: "/images/gallery/interiors/villa-bedroom-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa bedroom" },
+    { id: 12, src: "/images/gallery/interiors/deluxe-bedroom.jpg", category: "interiors", height: "h-[477px]", alt: "Deluxe room bedroom" },
+    { id: 13, src: "/images/gallery/interiors/chalet-bedroom.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet bedroom" },
+    { id: 14, src: "/images/gallery/interiors/chalet-studio.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet studio living space" },
+    { id: 15, src: "/images/gallery/interiors/chalet-sitting.jpg", category: "interiors", height: "h-[318px]", alt: "Chalet sitting corner" },
+    { id: 16, src: "/images/gallery/interiors/chalet-kitchenette.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet kitchenette" },
+    { id: 17, src: "/images/gallery/interiors/villa-bathroom-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa bathroom" },
+    { id: 18, src: "/images/gallery/interiors/villa-bathroom-02.jpg", category: "interiors", height: "h-[477px]", alt: "Villa walk-in shower" },
+    { id: 19, src: "/images/gallery/interiors/standard-bathroom.jpg", category: "interiors", height: "h-[477px]", alt: "Standard room bathroom" },
+    { id: 20, src: "/images/gallery/interiors/chalet-bathroom.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet bathroom" },
 ];
 
 const categories = [
@@ -59,6 +82,14 @@ export default function GalleryPage() {
         window.addEventListener("hashchange", applyHash);
         return () => window.removeEventListener("hashchange", applyHash);
     }, []);
+
+    const visibleImages =
+        activeCategory === "all"
+            ? galleryImages.filter(
+                (image, index, list) =>
+                    list.findIndex((entry) => entry.src === image.src) === index
+            )
+            : galleryImages.filter((image) => image.category === activeCategory);
 
     return (
         <main className="bg-[#FFFEF8] min-h-screen">
@@ -153,9 +184,10 @@ export default function GalleryPage() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
+                    key={activeCategory}
                     className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5"
                 >
-                    {galleryImages.map((image) => (
+                    {visibleImages.map((image) => (
                         <motion.div
                             key={image.id}
                             variants={fadeInUp}
@@ -163,7 +195,7 @@ export default function GalleryPage() {
                         >
                             <Image
                                 src={image.src}
-                                alt={`Gallery ${image.id}`}
+                                alt={image.alt}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 className="object-cover transition duration-700 ease-in-out"
