@@ -149,28 +149,6 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <hr className="border-[#F3E7E7]" />
-
-          {/* Contact */}
-          <section className="space-y-3 pt-2">
-            <h2 className="text-[20px] font-jako-bold text-[#2C2422] font-semibold">
-              Contact
-            </h2>
-            <div className="text-[#5A4F4D] space-y-1">
-              <p className="font-jako-bold text-[#2C2422]">1125 Beach Villa</p>
-              <p>Kokrobite, Ghana</p>
-              <p>
-                Email:{" "}
-                <a
-                  href="mailto:hello@1125beachvilla.com"
-                  className="text-[#6082a4] underline hover:text-[#2C2422] transition-colors"
-                >
-                  hello@1125beachvilla.com
-                </a>
-              </p>
-            </div>
-          </section>
-
         </div>
 
         {/* Back Link */}

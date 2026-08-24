@@ -249,77 +249,57 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
 }
 
 function GuestPolicyCard() {
-  const [openItems, setOpenItems] = useState<Record<number, boolean>>({
-    0: true,
-  });
-
-  const toggleItem = (index: number) => {
-    setOpenItems((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
   const policies = [
     {
       title: "1. Check-In & Check-Out",
-      content: (
-        <div className="space-y-1">
-          <p>
-            <span className="font-jako-bold text-[#2C2422]">Check-in:</span> 2:00 PM |{" "}
-            <span className="font-jako-bold text-[#2C2422]">Check-out:</span> 11:00 AM.
-          </p>
-          <p>Early check-in or late check-out may be available upon request and subject to a small additional fee.</p>
-          <p>Please present a valid photo ID at check-in.</p>
-        </div>
-      ),
+      points: [
+        "Check-in: 2:00 PM | Check-out: 11:00 AM.",
+        "Early check-in or late check-out may be available upon request and subject to a small additional fee.",
+        "Please present a valid photo ID at check-in.",
+      ],
     },
     {
       title: "2. Bookings & Payments",
-      content: (
-        <div className="space-y-1">
-          <p>Reservations are confirmed once full payment is received.</p>
-          <p>We accept mobile money, debit/credit cards, bank transfers, and approved online payment platforms.</p>
-          <p>All prices include applicable taxes and service charges unless stated otherwise.</p>
-        </div>
-      ),
+      points: [
+        "Reservations are confirmed once full payment is received.",
+        "We accept mobile money, debit/credit cards, bank transfers, and approved online payment platforms.",
+        "All prices include applicable taxes and service charges unless stated otherwise.",
+      ],
     },
     {
       title: "3. Cancellations & Refunds",
-      content: (
-        <div className="space-y-1">
-          <p>Cancel 7 days or more before your stay for a full refund.</p>
-          <p>Cancel 1–6 days before arrival for a 50% refund.</p>
-          <p>Same-day cancellations or no-shows are non-refundable.</p>
-          <p>Refunds are processed within 14 business days.</p>
-        </div>
-      ),
+      points: [
+        "Cancel 7 days or more before your stay for a full refund.",
+        "Cancel 1–6 days before arrival for a 50% refund.",
+        "Same-day cancellations or no-shows are non-refundable.",
+        "Refunds are processed within 14 business days.",
+      ],
     },
     {
       title: "4. Outside Food & Beverages",
-      content: (
-        <p>Guests are not permitted to bring external food or beverages onto the resort premises unless prior written authorisation has been obtained from management.</p>
-      ),
+      points: [
+        "Guests are not permitted to bring external food or beverages onto the resort premises unless prior written authorisation has been obtained from management.",
+      ],
     },
     {
       title: "5. Smoking Policy",
-      content: (
-        <p>Smoking is not permitted within any of the chalets or rooms. Any breach of this policy may result in additional charges or penalties.</p>
-      ),
+      points: [
+        "Smoking is not permitted within any of the chalets or rooms. Any breach of this policy may result in additional charges or penalties.",
+      ],
     },
     {
       title: "6. Pets",
-      content: (
-        <p>Pets are not allowed without prior notice and approval.</p>
-      ),
+      points: [
+        "Pets are not allowed without prior notice and approval.",
+      ],
     },
   ];
 
   return (
-    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-6">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-4 min-w-0 overflow-visible">
+      <div className="flex items-start gap-2 mb-3 min-w-0">
         <svg
-          className="w-4.5 h-4.5 text-[#6082a4] shrink-0"
+          className="w-4 h-4 text-[#6082a4] shrink-0 mt-0.5"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -331,49 +311,26 @@ function GuestPolicyCard() {
             d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <h3 className="text-[14px] tracking-[1.5px] uppercase font-[400] text-gray-700 font-jako-bold">
+        <h3 className="min-w-0 flex-1 text-[12px] tracking-[1px] uppercase font-[400] text-gray-700 font-jako-bold leading-snug break-words">
           1125 Beach Villa – Guest Policy
         </h3>
       </div>
 
-      <div className="space-y-2">
-        {policies.map((item, index) => {
-          const isOpen = Boolean(openItems[index]);
-          return (
-            <div
-              key={index}
-              className="border border-[#E5D7D7] rounded-xl overflow-hidden bg-white/60 transition-colors"
-            >
-              <button
-                type="button"
-                onClick={() => toggleItem(index)}
-                className="w-full px-4 py-3 text-left flex items-center justify-between text-[13px] font-jako-bold text-[#2C2422] hover:bg-[#FDFBF7] transition-colors gap-2"
-              >
-                <span>{item.title}</span>
-                <svg
-                  className={`w-4 h-4 text-[#6082a4] transition-transform duration-200 shrink-0 ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </button>
-              {isOpen && (
-                <div className="px-4 pb-3.5 pt-1.5 text-[12px] text-[#5A4F4D] font-jako-regular border-t border-[#F3E7E7] leading-relaxed">
-                  {item.content}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div className="space-y-3 min-w-0">
+        {policies.map((item) => (
+          <div key={item.title} className="min-w-0">
+            <h4 className="text-[12px] font-jako-bold text-[#2C2422] mb-1 leading-snug">
+              {item.title}
+            </h4>
+            <ul className="list-disc pl-4 space-y-0.5 text-[12px] text-[#5A4F4D] font-jako-regular leading-[1.45] marker:text-[#6082a4] break-words">
+              {item.points.map((point) => (
+                <li key={point} className="pl-0.5">
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -673,21 +630,23 @@ function PaymentCheckoutInner({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1440px] mx-auto items-start pt-4 py-6 md:py-8 px-6">
-      <div className="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-6">
-        {cartStatus === "loading" ? (
-          <OrderSummarySkeleton />
-        ) : cartStatus === "empty" ? (
-          <OrderSummaryEmpty />
-        ) : cartStatus === "expired" ? (
-          <OrderSummaryExpired />
-        ) : cartStatus === "ready" && cart ? (
-          <OrderSummaryCard cart={cart} />
-        ) : (
-          <OrderSummaryError
-            message={cartError ?? "Failed to retrieve cart"}
-            cartId={cartId}
-          />
-        )}
+      <div className="lg:col-span-4 flex flex-col gap-4 min-w-0">
+        <div className="lg:sticky lg:top-6">
+          {cartStatus === "loading" ? (
+            <OrderSummarySkeleton />
+          ) : cartStatus === "empty" ? (
+            <OrderSummaryEmpty />
+          ) : cartStatus === "expired" ? (
+            <OrderSummaryExpired />
+          ) : cartStatus === "ready" && cart ? (
+            <OrderSummaryCard cart={cart} />
+          ) : (
+            <OrderSummaryError
+              message={cartError ?? "Failed to retrieve cart"}
+              cartId={cartId}
+            />
+          )}
+        </div>
 
         <GuestPolicyCard />
       </div>

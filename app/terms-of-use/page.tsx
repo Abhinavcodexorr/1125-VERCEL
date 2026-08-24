@@ -12,9 +12,6 @@ export default function TermsOfUsePage() {
         
         {/* Header */}
         <div className="border-b border-[#E5D7D7] pb-8 mb-10 text-center sm:text-left">
-          <span className="text-[12px] uppercase tracking-[2px] font-bold text-[#6082a4] font-jako-bold block mb-2">
-            Legal & Compliance
-          </span>
           <h1 className="font-ogg-regular text-[36px] sm:text-[44px] text-[#2C2422] leading-tight font-medium">
             Terms & Conditions
           </h1>
@@ -138,28 +135,6 @@ export default function TermsOfUsePage() {
             <p className="text-[#5A4F4D]">
               These Terms & Conditions shall be governed by and construed in accordance with the laws of the Republic of Ghana. Any disputes arising out of or relating to these Terms & Conditions shall be subject to the exclusive jurisdiction of the courts of Ghana.
             </p>
-          </section>
-
-          <hr className="border-[#F3E7E7]" />
-
-          {/* Contact Information */}
-          <section className="space-y-3 pt-2">
-            <h2 className="text-[20px] font-jako-bold text-[#2C2422] font-semibold">
-              Contact Information
-            </h2>
-            <div className="text-[#5A4F4D] space-y-1">
-              <p className="font-jako-bold text-[#2C2422]">1125 Beach Villa</p>
-              <p>Kokrobite, Ghana</p>
-              <p>
-                Email:{" "}
-                <a
-                  href="mailto:hello@1125beachvilla.com"
-                  className="text-[#6082a4] underline hover:text-[#2C2422] transition-colors"
-                >
-                  hello@1125beachvilla.com
-                </a>
-              </p>
-            </div>
           </section>
 
         </div>
