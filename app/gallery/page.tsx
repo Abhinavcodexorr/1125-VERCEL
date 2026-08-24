@@ -19,6 +19,8 @@ const galleryImages: {
 }[] = [
     { id: 1, src: "/images/gallery/outdoor-pergola/pergola-01.jpg", category: "outdoor-pergola", height: "h-[477px]", alt: "Outdoor pergola lounge cabanas" },
     { id: 2, src: "/images/gallery/outdoor-pergola/pergola-02.jpg", category: "outdoor-pergola", height: "h-[318px]", alt: "Outdoor pergola seating and bar tables" },
+    { id: 26, src: "/images/gallery/deck-events/deck-01.jpg", category: "outdoor-pergola", height: "h-[282px]", alt: "Aerial view of outdoor pergola, deck, and beach" },
+    { id: 27, src: "/images/gallery/pool-beach/aerial-pools.jpg", category: "outdoor-pergola", height: "h-[282px]", alt: "Aerial view of pergolas, pools, and wooden deck" },
     { id: 3, src: "/images/gallery/deck-events/deck-dining.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck dining table for events" },
     { id: 4, src: "/images/gallery/deck-events/deck-terrace.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck terrace for events" },
     { id: 21, src: "/images/gallery/deck-events/deck-01.jpg", category: "deck-events", height: "h-[282px]", alt: "Aerial view of the oceanfront deck" },
