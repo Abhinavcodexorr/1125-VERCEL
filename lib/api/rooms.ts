@@ -512,18 +512,6 @@ async function parseRoomsResponse(response: Response): Promise<Room[]> {
   return json.data.filter((room) => room.isActive && !room.isDeleted);
 }
 
-/** List endpoint swaps `name`/`title`; merge each room with its detail record. */
-async function enrichRoomsWithDetailData(rooms: Room[]): Promise<Room[]> {
-  if (!rooms.length) return rooms;
-
-  return Promise.all(
-    rooms.map(async (room) => {
-      const detail = await fetchRoomBySlug(room.slug);
-      return detail ?? room;
-    })
-  );
-}
-
 export async function fetchRooms(): Promise<Room[]> {
   return fetchRoomsCached();
 }
@@ -533,8 +521,7 @@ const fetchRoomsCached = cache(async (): Promise<Room[]> => {
     cache: "no-store",
   });
 
-  const rooms = await parseRoomsResponse(response);
-  return enrichRoomsWithDetailData(rooms);
+  return parseRoomsResponse(response);
 });
 
 let roomsClientCache: { data: Room[]; expiresAt: number } | null = null;
@@ -552,13 +539,16 @@ export async function fetchRoomsClient(): Promise<Room[]> {
 
   roomsClientInflight = (async () => {
     try {
-      const response = await fetch("/api/rooms");
+      const response = await fetch("/api/rooms", { cache: "no-store" });
       const data = await parseRoomsResponse(response);
       roomsClientCache = {
         data,
         expiresAt: Date.now() + ROOMS_CLIENT_CACHE_MS,
       };
       return data;
+    } catch (error) {
+      console.error("Failed to fetch rooms:", error);
+      throw error;
     } finally {
       roomsClientInflight = null;
     }

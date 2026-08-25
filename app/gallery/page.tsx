@@ -13,31 +13,30 @@ const galleryImages: {
     id: number;
     src: string;
     category: GalleryCategory;
-    height: string;
     alt: string;
 }[] = [
-    { id: 1, src: "/images/gallery/outdoor-pergola/pergola-01.jpg", category: "outdoor-pergola", height: "h-[477px]", alt: "Outdoor pergola lounge cabanas" },
-    { id: 2, src: "/images/gallery/outdoor-pergola/pergola-02.jpg", category: "outdoor-pergola", height: "h-[318px]", alt: "Outdoor pergola seating and bar tables" },
-    { id: 26, src: "/images/gallery/deck-events/deck-01.jpg", category: "outdoor-pergola", height: "h-[282px]", alt: "Aerial view of outdoor pergola, deck, and beach" },
-    { id: 3, src: "/images/gallery/deck-events/deck-dining.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck dining table for events" },
-    { id: 4, src: "/images/gallery/deck-events/deck-terrace.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck terrace for events" },
-    { id: 21, src: "/images/gallery/deck-events/deck-01.jpg", category: "deck-events", height: "h-[282px]", alt: "Aerial view of the oceanfront deck" },
-    { id: 22, src: "/images/gallery/deck-events/lounge-01.jpg", category: "deck-events", height: "h-[318px]", alt: "Social lounge and events games room" },
-    { id: 24, src: "/images/gallery/deck-events/lounge-games.jpg", category: "deck-events", height: "h-[318px]", alt: "Events lounge board games" },
-    { id: 7, src: "/images/gallery/interiors/villa-living-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa living room" },
-    { id: 8, src: "/images/gallery/interiors/villa-living-02.jpg", category: "interiors", height: "h-[477px]", alt: "Villa lounge with television wall" },
-    { id: 9, src: "/images/gallery/interiors/dining-kitchen.jpg", category: "interiors", height: "h-[477px]", alt: "Dining area and kitchen" },
-    { id: 10, src: "/images/gallery/interiors/kitchen-bar.jpg", category: "interiors", height: "h-[477px]", alt: "Kitchen breakfast bar" },
-    { id: 11, src: "/images/gallery/interiors/villa-bedroom-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa bedroom" },
-    { id: 12, src: "/images/gallery/interiors/deluxe-bedroom.jpg", category: "interiors", height: "h-[477px]", alt: "Deluxe room bedroom" },
-    { id: 13, src: "/images/gallery/interiors/chalet-bedroom.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet bedroom" },
-    { id: 14, src: "/images/gallery/interiors/chalet-studio.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet studio living space" },
-    { id: 15, src: "/images/gallery/interiors/chalet-sitting.jpg", category: "interiors", height: "h-[318px]", alt: "Chalet sitting corner" },
-    { id: 16, src: "/images/gallery/interiors/chalet-kitchenette.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet kitchenette" },
-    { id: 17, src: "/images/gallery/interiors/villa-bathroom-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa bathroom" },
-    { id: 18, src: "/images/gallery/interiors/villa-bathroom-02.jpg", category: "interiors", height: "h-[477px]", alt: "Villa walk-in shower" },
-    { id: 19, src: "/images/gallery/interiors/standard-bathroom.jpg", category: "interiors", height: "h-[477px]", alt: "Standard room bathroom" },
-    { id: 20, src: "/images/gallery/interiors/chalet-bathroom.jpg", category: "interiors", height: "h-[477px]", alt: "Chalet bathroom" },
+    { id: 1, src: "/images/gallery/outdoor-pergola/pergola-01.jpg", category: "outdoor-pergola", alt: "Outdoor pergola lounge cabanas" },
+    { id: 2, src: "/images/gallery/outdoor-pergola/pergola-02.jpg", category: "outdoor-pergola", alt: "Outdoor pergola seating and bar tables" },
+    { id: 26, src: "/images/gallery/deck-events/deck-01.jpg", category: "outdoor-pergola", alt: "Aerial view of outdoor pergola, deck, and beach" },
+    { id: 3, src: "/images/gallery/deck-events/deck-dining.jpg", category: "deck-events", alt: "Oceanfront deck dining table for events" },
+    { id: 4, src: "/images/gallery/deck-events/deck-terrace.jpg", category: "deck-events", alt: "Oceanfront deck terrace for events" },
+    { id: 21, src: "/images/gallery/deck-events/deck-01.jpg", category: "deck-events", alt: "Aerial view of the oceanfront deck" },
+    { id: 22, src: "/images/gallery/deck-events/lounge-01.jpg", category: "deck-events", alt: "Social lounge and events games room" },
+    { id: 24, src: "/images/gallery/deck-events/lounge-games.jpg", category: "deck-events", alt: "Events lounge board games" },
+    { id: 7, src: "/images/gallery/interiors/villa-living-01.jpg", category: "interiors", alt: "Villa living room" },
+    { id: 8, src: "/images/gallery/interiors/villa-living-02.jpg", category: "interiors", alt: "Villa lounge with television wall" },
+    { id: 9, src: "/images/gallery/interiors/dining-kitchen.jpg", category: "interiors", alt: "Dining area and kitchen" },
+    { id: 10, src: "/images/gallery/interiors/kitchen-bar.jpg", category: "interiors", alt: "Kitchen breakfast bar" },
+    { id: 11, src: "/images/gallery/interiors/villa-bedroom-01.jpg", category: "interiors", alt: "Villa bedroom" },
+    { id: 12, src: "/images/gallery/interiors/deluxe-bedroom.jpg", category: "interiors", alt: "Deluxe room bedroom" },
+    { id: 13, src: "/images/gallery/interiors/chalet-bedroom.jpg", category: "interiors", alt: "Chalet bedroom" },
+    { id: 14, src: "/images/gallery/interiors/chalet-studio.jpg", category: "interiors", alt: "Chalet studio living space" },
+    { id: 15, src: "/images/gallery/interiors/chalet-sitting.jpg", category: "interiors", alt: "Chalet sitting corner" },
+    { id: 16, src: "/images/gallery/interiors/chalet-kitchenette.jpg", category: "interiors", alt: "Chalet kitchenette" },
+    { id: 17, src: "/images/gallery/interiors/villa-bathroom-01.jpg", category: "interiors", alt: "Villa bathroom" },
+    { id: 18, src: "/images/gallery/interiors/villa-bathroom-02.jpg", category: "interiors", alt: "Villa walk-in shower" },
+    { id: 19, src: "/images/gallery/interiors/standard-bathroom.jpg", category: "interiors", alt: "Standard room bathroom" },
+    { id: 20, src: "/images/gallery/interiors/chalet-bathroom.jpg", category: "interiors", alt: "Chalet bathroom" },
 ];
 
 const categories = [
@@ -103,8 +102,9 @@ export default function GalleryPage() {
                         fill
                         priority
                         sizes="calc(100vw - 2rem)"
-                        className="object-cover object-bottom brightness-125"
+                        className="object-cover object-bottom"
                     />
+                    <div className="absolute inset-0 bg-[#000]/40" />
                     <div className="absolute inset-0 flex items-center justify-center">
                         <motion.h1 
                             initial={{ opacity: 0, y: 20 }}
@@ -174,27 +174,27 @@ export default function GalleryPage() {
             </motion.section>
 
             {/* Gallery Grid */}
-            <section id="gallery" className="max-w-[1400px] mx-auto px-6 py-8  md:px-10 lg:px-12 ">
+            <section id="gallery" className="max-w-[1400px] mx-auto px-6 py-8 md:px-10 lg:px-12">
                 <motion.div 
                     variants={staggerContainer}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
                     key={activeCategory}
-                    className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5"
+                    className="grid grid-cols-1 md:grid-cols-3 gap-4"
                 >
                     {visibleImages.map((image) => (
                         <motion.div
                             key={image.id}
                             variants={fadeInUp}
-                            className={`relative ${image.height} overflow-hidden rounded-lg break-inside-avoid shadow-sm group`}
+                            className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-sm"
                         >
                             <Image
                                 src={image.src}
                                 alt={image.alt}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                className="object-cover transition duration-700 ease-in-out"
+                                className="object-cover"
                             />
                         </motion.div>
                     ))}

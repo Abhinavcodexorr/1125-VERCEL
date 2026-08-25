@@ -296,7 +296,7 @@ function GuestPolicyCard() {
   ];
 
   return (
-    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-4 min-w-0 overflow-visible">
+    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-4 min-w-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain">
       <div className="flex items-start gap-2 mb-3 min-w-0">
         <svg
           className="w-4 h-4 text-[#6082a4] shrink-0 mt-0.5"
@@ -630,8 +630,8 @@ function PaymentCheckoutInner({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1440px] mx-auto items-start pt-4 py-6 md:py-8 px-6">
-      <div className="lg:col-span-4 flex flex-col gap-4 min-w-0">
-        <div className="lg:sticky lg:top-6">
+      <div className="lg:col-span-4 flex flex-col gap-4 min-w-0 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-hidden">
+        <div className="shrink-0">
           {cartStatus === "loading" ? (
             <OrderSummarySkeleton />
           ) : cartStatus === "empty" ? (

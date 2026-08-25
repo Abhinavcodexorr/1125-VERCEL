@@ -10,7 +10,6 @@ const exploreLinks = [
 ];
 
 const supportLinks = [
-  { name: "FAQ", href: "#" },
   { name: "Contact Us", href: "/contact" },
   { name: "Privacy Policy", href: "/privacy-policy" },
   { name: "Terms of Use", href: "/terms-of-use" },
@@ -141,17 +140,17 @@ export default function Footer() {
 
         {/* Lower Divider Layer - Adjusted mt-12 to tight structure */}
         <div className="border-t border-white/10 mt-12 lg:mt-16 pt-6">
-          <div className="flex flex-col sm:flex-row items-center font-manrope-regular text-[12px] justify-between gap-4 text-xs md:text-sm text-[#FFFEF859] font-[400]">
+          <div className="flex flex-col sm:flex-row items-center font-manrope-regular text-[12px] justify-between gap-4 text-xs md:text-sm text-[#FFFEF8B8] font-[400]">
             
-            <p className="tracking-wide font-manrope-regula ">
+            <p className="tracking-wide font-manrope-regular">
               © 2026 1125 Beach Villa. All rights reserved.
             </p>
 
             <div className="flex gap-8 tracking-wide">
-              <Link href="/privacy-policy" className="hover:text-white transition-colors font-manrope-regular  text-[12px] text-[#FFFEF859] font-[400]">
+              <Link href="/privacy-policy" className="hover:text-white transition-colors font-manrope-regular text-[12px] text-[#FFFEF8B8] font-[400]">
                 Privacy
               </Link>
-              <Link href="/terms-of-use" className="hover:text-white transition-colors font-manrope-regular  text-[12px] text-[#FFFEF859] font-[400]">
+              <Link href="/terms-of-use" className="hover:text-white transition-colors font-manrope-regular text-[12px] text-[#FFFEF8B8] font-[400]">
                 Terms
               </Link>
             </div>
