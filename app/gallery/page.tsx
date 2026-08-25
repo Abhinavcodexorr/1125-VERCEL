@@ -7,8 +7,7 @@ import { motion } from "framer-motion";
 type GalleryCategory =
     | "outdoor-pergola"
     | "deck-events"
-    | "interiors"
-    | "pool-beach";
+    | "interiors";
 
 const galleryImages: {
     id: number;
@@ -20,15 +19,11 @@ const galleryImages: {
     { id: 1, src: "/images/gallery/outdoor-pergola/pergola-01.jpg", category: "outdoor-pergola", height: "h-[477px]", alt: "Outdoor pergola lounge cabanas" },
     { id: 2, src: "/images/gallery/outdoor-pergola/pergola-02.jpg", category: "outdoor-pergola", height: "h-[318px]", alt: "Outdoor pergola seating and bar tables" },
     { id: 26, src: "/images/gallery/deck-events/deck-01.jpg", category: "outdoor-pergola", height: "h-[282px]", alt: "Aerial view of outdoor pergola, deck, and beach" },
-    { id: 27, src: "/images/gallery/pool-beach/aerial-pools.jpg", category: "outdoor-pergola", height: "h-[282px]", alt: "Aerial view of pergolas, pools, and wooden deck" },
     { id: 3, src: "/images/gallery/deck-events/deck-dining.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck dining table for events" },
     { id: 4, src: "/images/gallery/deck-events/deck-terrace.jpg", category: "deck-events", height: "h-[318px]", alt: "Oceanfront deck terrace for events" },
     { id: 21, src: "/images/gallery/deck-events/deck-01.jpg", category: "deck-events", height: "h-[282px]", alt: "Aerial view of the oceanfront deck" },
     { id: 22, src: "/images/gallery/deck-events/lounge-01.jpg", category: "deck-events", height: "h-[318px]", alt: "Social lounge and events games room" },
     { id: 24, src: "/images/gallery/deck-events/lounge-games.jpg", category: "deck-events", height: "h-[318px]", alt: "Events lounge board games" },
-    { id: 5, src: "/images/gallery/pool-beach/aerial-pools.jpg", category: "pool-beach", height: "h-[282px]", alt: "Aerial view of swim-up pools and beach" },
-    { id: 25, src: "/images/gallery/deck-events/deck-01.jpg", category: "pool-beach", height: "h-[282px]", alt: "Aerial view of pools, deck, and beach" },
-    { id: 6, src: "/images/gallery/pool-beach/chalet-ocean.jpg", category: "pool-beach", height: "h-[318px]", alt: "Chalet bedroom opening to pool and ocean" },
     { id: 7, src: "/images/gallery/interiors/villa-living-01.jpg", category: "interiors", height: "h-[477px]", alt: "Villa living room" },
     { id: 8, src: "/images/gallery/interiors/villa-living-02.jpg", category: "interiors", height: "h-[477px]", alt: "Villa lounge with television wall" },
     { id: 9, src: "/images/gallery/interiors/dining-kitchen.jpg", category: "interiors", height: "h-[477px]", alt: "Dining area and kitchen" },
@@ -50,7 +45,6 @@ const categories = [
     { label: "Outdoor / Pergola", slug: "outdoor-pergola" },
     { label: "Deck & Events", slug: "deck-events" },
     { label: "Interiors", slug: "interiors" },
-    { label: "Pool & Beach", slug: "pool-beach" },
 ];
 
 // Animation Variants
