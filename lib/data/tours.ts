@@ -26,7 +26,7 @@ export const tours: TourItem[] = [
     feature: "Private Terrace, Direct Swim-Up Pool Access",
     labelType: "Units",
     labelValue: "5",
-    gallerySection: "pool-beach",
+    gallerySection: "interiors",
   },
   {
     id: 3,
