@@ -1,24 +1,29 @@
-import { fetchRooms } from "@/lib/api/rooms";
+import { getRoomsListUrl } from "@/lib/api/config";
+import { fetchBackend } from "@/lib/api/fetchBackend";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const url = getRoomsListUrl();
+
   try {
-    const data = await fetchRooms();
-    return NextResponse.json(
-      { success: true, data },
-      {
-        headers: {
-          "Cache-Control": "no-store, max-age=0, must-revalidate",
-        },
-      }
-    );
+    const response = await fetchBackend(url, { cache: "no-store" });
+    const body = await response.text();
+
+    return new NextResponse(body, {
+      status: response.status,
+      headers: {
+        "Content-Type":
+          response.headers.get("content-type") ?? "application/json",
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      },
+    });
   } catch (error) {
     console.error("Rooms proxy error:", error);
     return NextResponse.json(
-      { success: false, data: [] },
-      { status: 500 }
+      { success: false, data: [], error: "Unable to reach the rooms service" },
+      { status: 503 }
     );
   }
 }

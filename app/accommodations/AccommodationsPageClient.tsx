@@ -56,6 +56,7 @@ function AccommodationsPageContent({
 }) {
   const [listings, setListings] = useState<AccommodationListing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +64,14 @@ function AccommodationsPageContent({
     fetchRoomsClient()
       .then((rooms) => {
         if (!cancelled) {
+          setLoadError(false);
           setListings(mapRoomsToAccommodationListings(rooms));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError(true);
+          setListings([]);
         }
       })
       .finally(() => {
@@ -131,6 +139,10 @@ function AccommodationsPageContent({
         {isLoading ? (
           <div className="py-20 text-center text-[#8a929d] font-manrope-regular animate-pulse">
             Loading accommodations...
+          </div>
+        ) : loadError ? (
+          <div className="py-20 text-center text-[#8a929d] font-manrope-regular">
+            We couldn&apos;t load accommodations right now. Please refresh in a moment.
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center text-[#8a929d] font-manrope-regular">
