@@ -81,9 +81,7 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
     });
     const [adults, setAdults] = useState(initialSelection?.adults ?? 2);
     const [children, setChildren] = useState(initialSelection?.children ?? 0);
-    const [quantity, setQuantity] = useState(
-      showQuantity ? (initialSelection?.quantity ?? 1) : 1
-    );
+    const [quantity, setQuantity] = useState(initialSelection?.quantity ?? 1);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -121,6 +119,8 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
         guestCap === undefined || adults + 1 + children <= guestCap;
     const canAddChild =
         guestCap === undefined || adults + children + 1 <= guestCap;
+    const canAddChalet =
+        quantityCap === undefined || quantity < quantityCap;
 
     useEffect(() => {
         if (maxQuantity === undefined || maxQuantity < 1) return;
@@ -342,11 +342,12 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
                                         onClick={() => setQuantity(quantity - 1)}
                                         className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center text-[#BC2623] hover:bg-gray-50 disabled:opacity-40 font-bold"
                                     >-</button> */}
-                                    <button className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer
-                                    "
+                                    <button
+                                        className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                         type="button"
                                         disabled={quantity <= 1}
-                                        onClick={() => setQuantity(quantity - 1)}>
+                                        onClick={() => setQuantity(quantity - 1)}
+                                    >
                                         <svg width="12" height="12" viewBox="0 0 12 12">
                                             <path d="M1 6H11" stroke="#AF2F2C" strokeWidth="2" />
                                         </svg>
@@ -357,11 +358,15 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
                                         onClick={() => setQuantity(quantity + 1)}
                                         className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center text-[#BC2623] hover:bg-gray-50 font-bold"
                                     >+</button> */}
-                                    <button className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer"
-                                        onClick={() => setQuantity(quantity + 1)}
-                                        disabled={quantityCap !== undefined && quantity >= quantityCap}
-                                        type="button">
-
+                                    <button
+                                        type="button"
+                                        disabled={!canAddChalet}
+                                        onClick={() => {
+                                            if (!canAddChalet) return;
+                                            setQuantity(quantity + 1);
+                                        }}
+                                        className="w-8 h-8 rounded-full border border-[#D8D0C8] flex items-center justify-center cursor-pointer text-[#BC2623] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent font-bold"
+                                    >
                                         <svg width="12" height="12" viewBox="0 0 12 12">
                                             <path d="M1 6H11M6 1V11" stroke="#AF2F2C" strokeWidth="2" />
                                         </svg>

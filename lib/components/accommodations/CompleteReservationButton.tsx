@@ -41,7 +41,7 @@ export default function CompleteReservationButton({
     };
 
     if (showQuantity) {
-      payload.quantity = 1;
+      payload.quantity = Math.max(1, booking.quantity || 1);
     }
 
     const existingCartId = searchParams.get("cartId") ?? getStoredCartId();
