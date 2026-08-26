@@ -434,6 +434,58 @@ export async function fetchRoomAvailability(
   return json.success ? json.data : null;
 }
 
+export interface RoomBookedDatesResponse {
+  success: boolean;
+  message?: string;
+  data?: {
+    bookedDates?: string[];
+  };
+}
+
+function parseBookedDates(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((entry): entry is string => typeof entry === "string")
+    .map((entry) => entry.trim())
+    .filter((entry) => /^\d{4}-\d{2}-\d{2}/.test(entry))
+    .map((entry) => entry.slice(0, 10));
+}
+
+export async function fetchRoomBookedDates(
+  idOrSlug: string
+): Promise<string[]> {
+  const apiSlug = resolveRoomIdOrSlug(idOrSlug);
+  const url = `${getApiBaseUrl()}/api/v1/rooms/${encodeURIComponent(apiSlug)}/availability`;
+  const response = await fetchBackend(url, { cache: "no-store" });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch booked dates (${response.status})`);
+  }
+
+  const json = (await response.json()) as RoomBookedDatesResponse;
+  if (!json.success) return [];
+  return parseBookedDates(json.data?.bookedDates);
+}
+
+export async function fetchRoomBookedDatesClient(
+  idOrSlug: string
+): Promise<string[]> {
+  const apiSlug = resolveRoomIdOrSlug(idOrSlug);
+  const response = await fetch(
+    `/api/rooms/${encodeURIComponent(apiSlug)}/availability`,
+    { cache: "no-store" }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch booked dates (${response.status})`);
+  }
+
+  const json = (await response.json()) as RoomBookedDatesResponse;
+  if (!json.success) return [];
+  return parseBookedDates(json.data?.bookedDates);
+}
+
 export function formatAvailabilityLabel(
   availableUnits: number,
   unitSingular = "Chalet"

@@ -9,6 +9,7 @@ import BookingBox, {
 import CompleteReservationButton from "@/lib/components/accommodations/CompleteReservationButton";
 import { getCartClient } from "@/lib/api/cart";
 import {
+  fetchRoomBookedDatesClient,
   fetchRoomQuoteClientShared,
   formatAvailabilityLabel,
   type RoomQuote,
@@ -84,6 +85,30 @@ function AccommodationBookingPanelInner({
   >();
   const [quote, setQuote] = useState<RoomQuote | null>(null);
   const [isLoadingQuote, setIsLoadingQuote] = useState(false);
+  const [bookedDates, setBookedDates] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBookedDates() {
+      try {
+        const dates = await fetchRoomBookedDatesClient(roomId);
+        if (!cancelled) {
+          setBookedDates(dates);
+        }
+      } catch {
+        if (!cancelled) {
+          setBookedDates([]);
+        }
+      }
+    }
+
+    loadBookedDates();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [roomId]);
 
   useEffect(() => {
     if (!cartId) return;
@@ -243,6 +268,7 @@ function AccommodationBookingPanelInner({
         showQuantity={showQuantityPicker}
         maxQuantity={maxQuantity}
         maxTotalGuests={maxTotalGuests}
+        bookedDates={bookedDates}
         initialSelection={cartSelection}
         onSelectionChange={refreshQuote}
       />

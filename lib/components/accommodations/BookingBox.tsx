@@ -20,6 +20,7 @@ interface BookingBoxProps {
     showQuantity?: boolean;
     maxQuantity?: number;
     maxTotalGuests?: number;
+    bookedDates?: string[];
     initialSelection?: Partial<BookingSelection>;
     onSelectionChange?: (selection: BookingSelection) => void;
 }
@@ -62,9 +63,43 @@ function parseBookingDate(value: string): Date | null {
     return Number.isNaN(fallback.getTime()) ? null : fallback;
 }
 
+function isBookedNight(date: Date, bookedDates: Set<string>): boolean {
+    return bookedDates.has(formatBookingDate(date));
+}
+
+function stayOverlapsBooked(
+    checkIn: Date,
+    checkOut: Date,
+    bookedDates: Set<string>
+): boolean {
+    let cursor = startOfDay(checkIn);
+    const end = startOfDay(checkOut);
+    while (cursor < end) {
+        if (isBookedNight(cursor, bookedDates)) return true;
+        cursor = addDays(cursor, 1);
+    }
+    return false;
+}
+
+function findNextOpenCheckIn(from: Date, bookedDates: Set<string>, limit = 365): Date | null {
+    let cursor = startOfDay(from);
+    for (let i = 0; i < limit; i += 1) {
+        if (!isBookedNight(cursor, bookedDates)) return cursor;
+        cursor = addDays(cursor, 1);
+    }
+    return null;
+}
+
+function toExcludeDates(bookedDates: Set<string>): Date[] {
+    return Array.from(bookedDates).flatMap((value) => {
+        const parsed = parseBookingDate(value);
+        return parsed ? [parsed] : [];
+    });
+}
+
 // Prop add kiya hai showQuantity taaki sirf Chalets mein dikhe
 const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function BookingBox(
-    { showQuantity = false, maxQuantity, maxTotalGuests, initialSelection, onSelectionChange },
+    { showQuantity = false, maxQuantity, maxTotalGuests, bookedDates = [], initialSelection, onSelectionChange },
     ref
 ) {
     const [checkIn, setCheckIn] = useState<Date | null>(() => {
@@ -86,14 +121,53 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    const bookedDateSet = new Set(bookedDates);
+    const excludedBookedDates = toExcludeDates(bookedDateSet);
+
     useEffect(() => {
-        if (initialSelection?.checkInDate || initialSelection?.checkOutDate) {
+        const today = startOfDay(new Date());
+        const preferredCheckIn = initialSelection?.checkInDate
+            ? parseBookingDate(initialSelection.checkInDate)
+            : null;
+        const preferredCheckOut = initialSelection?.checkOutDate
+            ? parseBookingDate(initialSelection.checkOutDate)
+            : null;
+
+        const nextCheckIn =
+            preferredCheckIn &&
+            preferredCheckIn >= today &&
+            !isBookedNight(preferredCheckIn, bookedDateSet)
+                ? preferredCheckIn
+                : findNextOpenCheckIn(
+                    preferredCheckIn && preferredCheckIn > today ? preferredCheckIn : today,
+                    bookedDateSet
+                );
+
+        if (!nextCheckIn) {
+            setCheckIn(null);
+            setCheckOut(null);
             return;
         }
-        const today = startOfDay(new Date());
-        setCheckIn(today);
-        setCheckOut(addDays(today, 1));
-    }, [initialSelection?.checkInDate, initialSelection?.checkOutDate]);
+
+        const fallbackCheckOut = addDays(nextCheckIn, 1);
+        const nextCheckOut =
+            preferredCheckOut &&
+            preferredCheckOut > nextCheckIn &&
+            !stayOverlapsBooked(nextCheckIn, preferredCheckOut, bookedDateSet)
+                ? preferredCheckOut
+                : fallbackCheckOut;
+
+        setCheckIn((current) =>
+            current && formatBookingDate(current) === formatBookingDate(nextCheckIn)
+                ? current
+                : nextCheckIn
+        );
+        setCheckOut((current) =>
+            current && formatBookingDate(current) === formatBookingDate(nextCheckOut)
+                ? current
+                : nextCheckOut
+        );
+    }, [bookedDates, initialSelection?.checkInDate, initialSelection?.checkOutDate]);
 
     useEffect(() => {
         if (!checkIn || !checkOut || !onSelectionChange) return;
@@ -196,19 +270,21 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
                     </svg>
                 </button>
 
-                {activeDropdown === "checkin" && checkIn && (
+                {activeDropdown === "checkin" && (
                     <div className="absolute top-full left-0 mt-2 z-[99999] scale-[0.85] md:scale-100 origin-top-left ">
                         <DatePicker
                             selected={checkIn}
                             minDate={today}
+                            excludeDates={excludedBookedDates}
+                            filterDate={(date) => !isBookedNight(date, bookedDateSet)}
                             onChange={(date: Date | null) => {
-                                if (date) {
-                                    setCheckIn(date);
-                                    if (checkOut && date >= checkOut) {
-                                        setCheckOut(addDays(date, 1));
-                                    }
-                                    setActiveDropdown(null);
+                                if (!date || isBookedNight(date, bookedDateSet)) return;
+                                setCheckIn(date);
+                                const nextNight = addDays(date, 1);
+                                if (!checkOut || checkOut <= date || stayOverlapsBooked(date, checkOut, bookedDateSet)) {
+                                    setCheckOut(nextNight);
                                 }
+                                setActiveDropdown(null);
                             }}
                             inline
                         />
@@ -233,17 +309,19 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
 
 
 
-                {activeDropdown === "checkout" && checkIn && checkOut && (
+                {activeDropdown === "checkout" && checkIn && (
                     <div className="absolute top-full left-0 mt-2 z-[99999] scale-[0.85] md:scale-100 origin-top-left shadow-xl bg-white">
                         <DatePicker
                             selected={checkOut}
                             minDate={addDays(checkIn, 1)}
-                            filterDate={(d) => d > checkIn}
+                            filterDate={(date) =>
+                                date > checkIn && !stayOverlapsBooked(checkIn, date, bookedDateSet)
+                            }
                             onChange={(date: Date | null) => {
-                                if (date) {
-                                    setCheckOut(date);
-                                    setActiveDropdown(null);
-                                }
+                                if (!date || date <= checkIn) return;
+                                if (stayOverlapsBooked(checkIn, date, bookedDateSet)) return;
+                                setCheckOut(date);
+                                setActiveDropdown(null);
                             }}
                             inline
                         />

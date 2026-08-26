@@ -117,7 +117,12 @@ export default async function AccommodationDetailPage({
                         displayType={displayType}
                         description={room.description}
                         guests={room.guests}
-                        bedConfiguration={room.bedConfiguration}
+                        bedConfiguration={
+                          room.bedConfiguration ||
+                          apiRoom.bedConfiguration ||
+                          allRooms.find((item) => item.slug === room.slug)?.bedConfiguration ||
+                          ""
+                        }
                         image={room.image}
                         galleryImages={room.galleryImages}
                         currencySymbol={room.currencySymbol}
