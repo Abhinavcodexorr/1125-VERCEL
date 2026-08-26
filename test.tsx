@@ -119,7 +119,7 @@
 
                 {/* BOOKING BOX: Cream background and Rectangle style */}
                 <div className="w-full bg-[#FFFEF8] border border-[#E7DDD4] rounded-2xl p-6 md:p-8 mt-10">
-                    <BookingBox showQuantity={false} />
+                    <BookingBox showQuantity={slug === "chalets"} />
                     <div className="mt-8 flex justify-center lg:justify-start">
                         <Link
                             href="/payment"

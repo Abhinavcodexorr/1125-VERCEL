@@ -25,7 +25,7 @@ interface AccommodationBookingPanelProps {
 }
 
 function quoteQueryKey(selection: BookingSelection): string {
-  return `${selection.checkInDate}|${selection.checkOutDate}|${selection.adults}`;
+  return `${selection.checkInDate}|${selection.checkOutDate}|${selection.adults}|${selection.quantity}`;
 }
 
 function AvailabilityBadge({
@@ -65,6 +65,7 @@ function AvailabilityBadge({
 
 function AccommodationBookingPanelInner({
   roomId,
+  totalUnits,
   availabilityUnit = "Chalet",
   checkAvailability = false,
   onQuoteChange,
@@ -106,7 +107,7 @@ function AccommodationBookingPanelInner({
               checkOutDate: item.checkOutDate,
               adults: item.adults,
               children: item.children,
-              quantity: 1,
+              quantity: item.quantity > 0 ? item.quantity : 1,
             });
           }
         }
@@ -147,7 +148,7 @@ function AccommodationBookingPanelInner({
             checkInDate: selection.checkInDate,
             checkOutDate: selection.checkOutDate,
             adults: selection.adults,
-            quantity: 1,
+            quantity: Math.max(1, selection.quantity || 1),
           });
 
           if (requestId !== requestIdRef.current) return;
@@ -177,6 +178,7 @@ function AccommodationBookingPanelInner({
   }, []);
 
   const availability = quote?.availability ?? null;
+  const showQuantityPicker = checkAvailability && totalUnits > 1;
   const showAvailabilityBadge = checkAvailability;
 
   const availableUnits = availability?.availableUnits ?? 0;
@@ -188,6 +190,12 @@ function AccommodationBookingPanelInner({
     : isAvailable
       ? "Available"
       : "Not available";
+
+  const maxQuantity = showQuantityPicker
+    ? availableUnits > 0
+      ? availableUnits
+      : totalUnits
+    : undefined;
 
   const canReserve = checkAvailability
     ? Boolean(availability?.isAvailable) && !isLoadingQuote
@@ -203,10 +211,10 @@ function AccommodationBookingPanelInner({
             isAvailable={false}
           />
         )}
-        <BookingBoxSkeleton showQuantity={false} />
+        <BookingBoxSkeleton showQuantity={showQuantityPicker} />
         <CompleteReservationButton
           roomId={roomId}
-          showQuantity={false}
+          showQuantity={showQuantityPicker}
           disabled
           getBooking={() => ({
             checkInDate: "",
@@ -232,7 +240,8 @@ function AccommodationBookingPanelInner({
 
       <BookingBox
         ref={bookingRef}
-        showQuantity={false}
+        showQuantity={showQuantityPicker}
+        maxQuantity={maxQuantity}
         maxTotalGuests={maxTotalGuests}
         initialSelection={cartSelection}
         onSelectionChange={refreshQuote}
@@ -240,7 +249,7 @@ function AccommodationBookingPanelInner({
 
       <CompleteReservationButton
         roomId={roomId}
-        showQuantity={false}
+        showQuantity={showQuantityPicker}
         disabled={!canReserve}
         getBooking={() =>
           bookingRef.current?.getBooking() ?? {
@@ -279,7 +288,7 @@ export default function AccommodationBookingPanel(
 ) {
   return (
     <Suspense
-      fallback={<BookingBoxSkeleton showQuantity={false} />}
+      fallback={<BookingBoxSkeleton showQuantity={props.totalUnits > 1} />}
     >
       <AccommodationBookingPanelInner {...props} />
     </Suspense>
