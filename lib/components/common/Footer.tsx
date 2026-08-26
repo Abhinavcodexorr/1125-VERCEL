@@ -124,13 +124,13 @@ export default function Footer() {
             <div className="space-y-3.5 text-[14px] font-light text-white/75">
               <p className="cursor-default font-manrope-regular text-[#FFFEF8A6] text-[14px] font-[400]">Kokrobite, Ghana</p>
               <p>
-                <a href="mailto:hello@1125beachvilla.com" className="hover:text-white text-[#FFFEF8A6] text-[14px] font-[400] font-manrope-regular transition-colors block truncate">
-                  hello@1125beachvilla.com
+                <a href="mailto:info@1125beachvilla.com" className="hover:text-white text-[#FFFEF8A6] text-[14px] font-[400] font-manrope-regular transition-colors block truncate">
+                  info@1125beachvilla.com
                 </a>
               </p>
               <p>
-                <a href="tel:+233302000000" className="hover:text-white text-[#FFFEF8A6] text-[14px] font-[400] font-manrope-regular transition-colors block">
-                  +233 (0) 302 000 000
+                <a href="tel:+233241534453" className="hover:text-white text-[#FFFEF8A6] text-[14px] font-[400] font-manrope-regular transition-colors block">
+                  +233 241{"  "}534 453
                 </a>
               </p>
             </div>

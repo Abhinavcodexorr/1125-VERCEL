@@ -41,7 +41,7 @@ export default function CompleteReservationButton({
     };
 
     if (showQuantity) {
-      payload.quantity = booking.quantity;
+      payload.quantity = 1;
     }
 
     const existingCartId = searchParams.get("cartId") ?? getStoredCartId();
@@ -50,7 +50,7 @@ export default function CompleteReservationButton({
     }
 
     const validationError = validateCartPayload(payload, {
-      includeQuantity: showQuantity,
+      includeQuantity: payload.quantity !== undefined,
     });
     if (validationError) {
       setError(validationError);

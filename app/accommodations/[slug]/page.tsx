@@ -116,6 +116,8 @@ export default async function AccommodationDetailPage({
                         checkAvailability={room.slug === "chalets"}
                         displayType={displayType}
                         description={room.description}
+                        guests={room.guests}
+                        bedConfiguration={room.bedConfiguration}
                         image={room.image}
                         galleryImages={room.galleryImages}
                         currencySymbol={room.currencySymbol}

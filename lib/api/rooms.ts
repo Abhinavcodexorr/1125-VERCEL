@@ -125,6 +125,7 @@ export interface Room {
   quantity: number;
   adultCapacity: number;
   childCapacity: number;
+  bedConfiguration?: string;
   amenities: RoomAmenity[];
   images: RoomImage[];
   isActive: boolean;
@@ -214,6 +215,8 @@ export interface RoomPageData {
   galleryImages: string[];
   quantity: number;
   amenities: RoomAmenity[];
+  guests: number;
+  bedConfiguration?: string;
 }
 
 function getLocalTitle(slug: string): string | undefined {
@@ -264,6 +267,8 @@ export function mapRoomToPageData(room: Room): RoomPageData {
     galleryImages: galleryImages.length ? galleryImages : [image],
     quantity: room.quantity,
     amenities: room.amenities,
+    guests: room.guests,
+    bedConfiguration: room.bedConfiguration?.trim() || "",
   };
 }
 
@@ -346,9 +351,9 @@ const AVAILABILITY_CACHE_MS = 15_000;
 
 function availabilityRequestKey(
   idOrSlug: string,
-  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults" | "quantity">
 ): string {
-  return `${idOrSlug}|${query.checkInDate}|${query.checkOutDate}|${query.adults ?? ""}`;
+  return `${idOrSlug}|${query.checkInDate}|${query.checkOutDate}|${query.adults ?? ""}|${query.quantity ?? ""}`;
 }
 
 function mapRoomToQuote(room: Room | null): RoomQuote | null {
@@ -367,7 +372,7 @@ function mapRoomToQuote(room: Room | null): RoomQuote | null {
 /** Dedupes identical quote requests (e.g. desktop + mobile booking panels). */
 export async function fetchRoomQuoteClientShared(
   idOrSlug: string,
-  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults" | "quantity">
 ): Promise<RoomQuote | null> {
   if (!query.checkInDate || !query.checkOutDate) return null;
 
@@ -397,7 +402,7 @@ export async function fetchRoomQuoteClientShared(
 /** @deprecated Use fetchRoomQuoteClientShared — returns availability only. */
 export async function fetchRoomAvailabilityClientShared(
   idOrSlug: string,
-  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults">
+  query: Pick<RoomDetailQuery, "checkInDate" | "checkOutDate" | "adults" | "quantity">
 ): Promise<RoomAvailability | null> {
   const quote = await fetchRoomQuoteClientShared(idOrSlug, query);
   return quote?.availability ?? null;
@@ -449,6 +454,14 @@ export function parseRoomAvailability(room: Room | null): RoomAvailability | nul
   return room.availability;
 }
 
+export function isRoomDimensionLabel(text: string): boolean {
+  const label = text.toLowerCase().trim();
+  return (
+    /\d+\s*(sq\.?\s*m|sqm|m²|m2|square\s*met)/i.test(label) ||
+    /^(size|area|room size|square metres?|sq m|sqm)$/i.test(label)
+  );
+}
+
 export interface AccommodationListing {
   id: string;
   slug: string;
@@ -460,6 +473,7 @@ export interface AccommodationListing {
   price: number;
   formattedPrice: string;
   guests: number;
+  bedConfiguration: string;
   area: number;
   areaUnit: string;
   image: string;
@@ -479,11 +493,14 @@ export function mapRoomToAccommodationListing(room: Room): AccommodationListing 
     price: room.price,
     formattedPrice: formatListingPrice(room.price, room.currencySymbol),
     guests: room.guests,
+    bedConfiguration: room.bedConfiguration?.trim() || "",
     area: room.size,
     areaUnit: room.unit,
     image: sortedImages[0]?.url ?? "",
     description: room.description,
-    features: room.amenities.map((amenity) => amenity.name),
+    features: room.amenities
+      .map((amenity) => amenity.name)
+      .filter((name) => !isRoomDimensionLabel(name)),
   };
 }
 

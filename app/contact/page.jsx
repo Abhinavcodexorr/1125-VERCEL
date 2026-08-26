@@ -272,8 +272,9 @@ export default function ContactPage() {
                 <div className="space-y-6 pr-10">
                   <div>
                     <p className="text-[11px] uppercase tracking-[2px] text-gray-400 mb-2 font-jako-bold">Direct</p>
-                    <p className="font-manrope-regular text-[#2C2422] text-[18px] lg:text-[20px] leading-tight">+233 50 940 4673</p>
-                    <p className="font-manrope-regular text-[#2C2422] text-[18px] lg:text-[20px] leading-tight">+233 24 970 8679</p>
+                    <a href="tel:+233241534453" className="font-manrope-regular text-[#2C2422] text-[18px] lg:text-[20px] leading-tight block">
+                      +233 241{"  "}534 453
+                    </a>
                   </div>
                   <div>
                     <p className="text-[11px] uppercase tracking-[2px] text-gray-400 mb-2 font-jako-bold">Location</p>

@@ -81,7 +81,9 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
     });
     const [adults, setAdults] = useState(initialSelection?.adults ?? 2);
     const [children, setChildren] = useState(initialSelection?.children ?? 0);
-    const [quantity, setQuantity] = useState(initialSelection?.quantity ?? 1);
+    const [quantity, setQuantity] = useState(
+      showQuantity ? (initialSelection?.quantity ?? 1) : 1
+    );
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -103,9 +105,9 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
             checkOutDate: formatBookingDate(checkOut),
             adults,
             children,
-            quantity,
+            quantity: showQuantity ? quantity : 1,
         });
-    }, [checkIn, checkOut, adults, children, quantity, onSelectionChange]);
+    }, [checkIn, checkOut, adults, children, quantity, showQuantity, onSelectionChange]);
 
     const quantityCap =
         maxQuantity !== undefined && maxQuantity > 0 ? maxQuantity : undefined;
@@ -165,7 +167,7 @@ const BookingBox = forwardRef<BookingBoxHandle, BookingBoxProps>(function Bookin
             checkOutDate: checkOut ? formatBookingDate(checkOut) : "",
             adults,
             children,
-            quantity,
+            quantity: showQuantity ? quantity : 1,
         }),
     }));
 

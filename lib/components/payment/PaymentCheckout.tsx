@@ -18,6 +18,7 @@ import {
   formatDayTypeNightLabel,
   formatGuests,
   formatPaymentMoney,
+  getCartComputedSubtotal,
   getCartItemImage,
   getCartItemImageAlt,
   getCartItemPriceLines,
@@ -154,6 +155,8 @@ function OrderSummaryExpired() {
 }
 
 function OrderSummaryCard({ cart }: { cart: CartData }) {
+  const total = getCartComputedSubtotal(cart.items) || cart.subTotal;
+
   return (
     <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-6">
       <h3 className="text-[14px] tracking-[1.5px] uppercase font-[400] text-gray-700 mb-5 font-jako-bold">
@@ -226,7 +229,11 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
                 </span>{" "}
                 x {line.nights}{" "}
                 {formatDayTypeNightLabel(line.dayType, line.nights)}
-                {item.quantity > 1 ? ` x ${item.quantity} units` : ""}
+                {item.quantity > 1
+                  ? ` x ${item.quantity} ${
+                      item.roomSnapshot.slug === "chalets" ? "chalets" : "units"
+                    }`
+                  : ""}
               </span>
               <span className="text-[14px] text-[#2C2422] font-jako-bold shrink-0">
                 {formatPaymentMoney(line.total, item.currency)}
@@ -241,7 +248,7 @@ function OrderSummaryCard({ cart }: { cart: CartData }) {
           Total
         </span>
         <span className="text-[18px] font-[400] text-[#2C2422] font-jako-bold">
-          {formatPaymentMoney(cart.subTotal, cart.currency)}
+          {formatPaymentMoney(total, cart.currency)}
         </span>
       </div>
     </div>
@@ -618,7 +625,10 @@ function PaymentCheckoutInner({
   const payLabel = cart
     ? isSubmitting
       ? "Redirecting..."
-      : `Pay ${formatPaymentMoney(cart.subTotal, cart.currency)}`
+      : `Pay ${formatPaymentMoney(
+          getCartComputedSubtotal(cart.items) || cart.subTotal,
+          cart.currency
+        )}`
     : "Pay Now";
   const canPay = Boolean(
     cartStatus === "ready" &&

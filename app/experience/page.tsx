@@ -169,9 +169,12 @@ export default function EventsPage() {
               Enquire Now
             </button>
 
-            <button className="border border-black cursor-pointer px-8 py-4 text-[#242424] rounded-full text-[12px] font-[700] font-manrope-regular">
-              +233 (0) 502 000 000
-            </button>
+            <a
+              href="tel:+233241534453"
+              className="border border-black cursor-pointer px-8 py-4 text-[#242424] rounded-full text-[12px] font-[700] font-manrope-regular inline-flex items-center justify-center"
+            >
+              +233 241{"  "}534 453
+            </a>
           </div>
         </motion.div>
       </section>
