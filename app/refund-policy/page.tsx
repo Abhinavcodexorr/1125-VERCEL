@@ -62,10 +62,10 @@ export default function RefundPolicyPage() {
               <p>
                 Email:{" "}
                 <a
-                  href="mailto:hello@1125beachvilla.com"
+                  href="mailto:info@1125beachvilla.com"
                   className="text-[#6082a4] underline hover:text-[#2C2422] transition-colors"
                 >
-                  hello@1125beachvilla.com
+                  info@1125beachvilla.com
                 </a>
               </p>
             </div>

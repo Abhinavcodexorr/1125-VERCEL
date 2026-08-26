@@ -214,45 +214,31 @@ function AccommodationsPageContent({
                     </svg>
                     Up to {item.guests} guests
                   </span>
-                  <span className="flex items-center gap-1.5 text-[13px] font-[400] font-manrope-regular">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.33333 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V5.33333"
-                        stroke="#AE2020"
-                        strokeWidth="1.33333"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M13.9998 5.33333V3.33333C13.9998 2.97971 13.8594 2.64057 13.6093 2.39052C13.3593 2.14048 13.0201 2 12.6665 2H10.6665"
-                        stroke="#AE2020"
-                        strokeWidth="1.33333"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M2 10.666V12.666C2 13.0196 2.14048 13.3588 2.39052 13.6088C2.64057 13.8589 2.97971 13.9993 3.33333 13.9993H5.33333"
-                        stroke="#AE2020"
-                        strokeWidth="1.33333"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10.6665 13.9993H12.6665C13.0201 13.9993 13.3593 13.8589 13.6093 13.6088C13.8594 13.3588 13.9998 13.0196 13.9998 12.666V10.666"
-                        stroke="#AE2020"
-                        strokeWidth="1.33333"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    {item.area} {item.areaUnit}
-                  </span>
+                  {item.bedConfiguration ? (
+                    <span className="flex items-center gap-1.5 text-[13px] font-[400] font-manrope-regular">
+                      <svg
+                        className="w-5 h-5 text-[#AE2020]"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.75"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 18v-5.5A1.5 1.5 0 0 1 4.5 11H20a1.5 1.5 0 0 1 1.5 1.5V18"
+                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 18h18M3 18v2m18-2v2" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5.5 11V8.25A1.75 1.75 0 0 1 7.25 6.5h4A1.75 1.75 0 0 1 13 8.25V11"
+                        />
+                      </svg>
+                      {item.bedConfiguration}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="border-t border-[#66839C1F] my-6"></div>

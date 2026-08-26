@@ -134,7 +134,16 @@ export function getCartItemPriceLines(item: CartItem): CartPriceLine[] {
       dayType: "other",
       rate,
       nights: item.nights,
-      total: item.subTotal ?? rate * item.nights * quantity,
+      total: rate * item.nights * quantity,
     },
   ];
+}
+
+export function getCartComputedSubtotal(items: CartItem[]): number {
+  return items.reduce((sum, item) => {
+    return (
+      sum +
+      getCartItemPriceLines(item).reduce((lineSum, line) => lineSum + line.total, 0)
+    );
+  }, 0);
 }

@@ -3,11 +3,12 @@ import type { CartData, CartItem } from "@/lib/api/cart";
 import { getHighestPerNightRate } from "@/lib/api/rooms";
 import {
   formatDayTypeNightLabel,
+  getCartComputedSubtotal,
   getCartItemPriceLines,
   type CartPriceLine,
 } from "@/lib/utils/cartPricing";
 
-export { formatDayTypeNightLabel, getCartItemPriceLines, type CartPriceLine };
+export { formatDayTypeNightLabel, getCartComputedSubtotal, getCartItemPriceLines, type CartPriceLine };
 
 const LEGACY_SLUG_MAP: Record<string, string> = {
   "the-villa": "5-bedroom-beach-house",
@@ -78,8 +79,16 @@ export function formatGuests(item: CartItem): string {
     );
   }
 
-  if (item.quantity > 1) {
-    parts.push(`${item.quantity} Units`);
+  if (item.quantity > 0) {
+    const isChalet = item.roomSnapshot.slug === "chalets";
+    const unit = isChalet
+      ? item.quantity === 1
+        ? "Chalet"
+        : "Chalets"
+      : item.quantity === 1
+        ? "Unit"
+        : "Units";
+    parts.push(`${item.quantity} ${unit}`);
   }
 
   return parts.join(", ");
@@ -122,7 +131,7 @@ export function getPrimaryRoomDetailHref(cart: CartData | null | undefined): str
 }
 
 export function getItemLineTotal(item: CartItem): number {
-  return item.subTotal ?? item.pricePerNight * item.nights * item.quantity;
+  return item.pricePerNight * item.nights * (item.quantity > 0 ? item.quantity : 1);
 }
 
 /** Payment summary — commas, no .00 for whole amounts. */

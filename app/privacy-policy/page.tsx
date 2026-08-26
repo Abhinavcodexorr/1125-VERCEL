@@ -128,10 +128,10 @@ export default function PrivacyPolicyPage() {
             <p className="pt-2 text-[#5A4F4D]">
               Contact us at{" "}
               <a
-                href="mailto:hello@1125beachvilla.com"
+                href="mailto:info@1125beachvilla.com"
                 className="text-[#6082a4] underline hover:text-[#2C2422] transition-colors"
               >
-                hello@1125beachvilla.com
+                info@1125beachvilla.com
               </a>{" "}
               for privacy-related requests.
             </p>

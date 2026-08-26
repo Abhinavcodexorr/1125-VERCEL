@@ -231,6 +231,7 @@ export async function enrichCartWithRoomPricing(
           checkInDate: normalized.checkInDate,
           checkOutDate: normalized.checkOutDate,
           adults: normalized.adults,
+          quantity: normalized.quantity > 0 ? normalized.quantity : 1,
         });
 
         const availability = quote?.availability;
@@ -246,7 +247,10 @@ export async function enrichCartWithRoomPricing(
           weNights: availability.weNights ?? normalized.weNights,
           nightBreakdown:
             availability.nightBreakdown ?? normalized.nightBreakdown,
-          subTotal: normalized.subTotal ?? availability.subTotal ?? cart.subTotal,
+          subTotal:
+            availability.subTotal ??
+            normalized.subTotal ??
+            cart.subTotal,
         });
       } catch {
         return normalized;
@@ -254,7 +258,9 @@ export async function enrichCartWithRoomPricing(
     })
   );
 
-  return { ...cart, items };
+  const subTotal = items.reduce((sum, item) => sum + (item.subTotal ?? 0), 0);
+
+  return { ...cart, items, subTotal: subTotal > 0 ? subTotal : cart.subTotal };
 }
 
 export async function getCartClient(cartId: string): Promise<GetCartResponse> {
