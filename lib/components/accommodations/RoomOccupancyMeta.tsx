@@ -3,11 +3,22 @@ interface RoomOccupancyMetaProps {
   bedConfiguration?: string;
 }
 
+function formatBedLabel(bed: string): string {
+  if (/\bbedrooms?\b/i.test(bed)) return bed;
+  if (/\bbeds?\b/i.test(bed)) {
+    return bed
+      .replace(/\bBeds\b/gi, "Bedrooms")
+      .replace(/\bBed\b/gi, "Bedroom");
+  }
+  return `${bed} Bedroom`;
+}
+
 export default function RoomOccupancyMeta({
   guests,
   bedConfiguration,
 }: RoomOccupancyMetaProps) {
   const bed = bedConfiguration?.trim() || "";
+  const bedLabel = bed ? formatBedLabel(bed) : "";
 
   if (guests <= 0 && !bed) return null;
 
@@ -60,7 +71,7 @@ export default function RoomOccupancyMeta({
               d="M5.5 11V8.25A1.75 1.75 0 0 1 7.25 6.5h4A1.75 1.75 0 0 1 13 8.25V11"
             />
           </svg>
-          {bed}
+          {bedLabel}
         </span>
       ) : null}
     </div>

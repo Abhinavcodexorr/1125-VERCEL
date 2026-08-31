@@ -78,7 +78,7 @@ export default function Footer() {
                   </svg>
               </div>
             </Link>
-            <p className="text-sm md:text-[13px] leading-relaxed text-[#FFFEF880] max-w-[250px] font-[400] font-manrope-regular">
+            <p className="text-sm md:text-[13px] leading-relaxed text-[#FFFEF880] max-w-[250px] font-jako-medium">
               Your private corner of the Ghanaian coast —
               where luxury meets the Atlantic.
             </p>

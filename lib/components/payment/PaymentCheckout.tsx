@@ -303,25 +303,10 @@ function GuestPolicyCard() {
   ];
 
   return (
-    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-4 min-w-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain">
-      <div className="flex items-start gap-2 mb-3 min-w-0">
-        <svg
-          className="w-4 h-4 text-[#6082a4] shrink-0 mt-0.5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <h3 className="min-w-0 flex-1 text-[12px] tracking-[1px] uppercase font-[400] text-gray-700 font-jako-bold leading-snug break-words">
-          1125 Beach Villa – Guest Policy
-        </h3>
-      </div>
+    <div className="bg-[#FFFEF8] rounded-2xl border border-gray-200/80 p-4 min-w-0">
+      <h3 className="mb-3 min-w-0 text-[12px] tracking-[1px] uppercase font-[400] text-gray-700 font-jako-bold leading-snug break-words">
+        1125 Beach Villa – Guest Policy
+      </h3>
 
       <div className="space-y-3 min-w-0">
         {policies.map((item) => (
@@ -640,7 +625,7 @@ function PaymentCheckoutInner({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1440px] mx-auto items-start pt-4 py-6 md:py-8 px-6">
-      <div className="lg:col-span-4 flex flex-col gap-4 min-w-0 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-hidden">
+      <div className="lg:col-span-4 flex flex-col gap-4 min-w-0">
         <div className="shrink-0">
           {cartStatus === "loading" ? (
             <OrderSummarySkeleton />

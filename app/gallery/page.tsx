@@ -16,73 +16,36 @@ const galleryImages: {
     alt: string;
 }[] = [
     { id: 1, src: "/images/gallery/outdoor-bar/pr60415.jpg", category: "outdoor-pergola", alt: "Outdoor bar" },
-    { id: 2, src: "/images/gallery/outdoor-bar/pr60419.jpg", category: "outdoor-pergola", alt: "Outdoor bar" },
     { id: 3, src: "/images/gallery/social-lounge/pr60136.jpg", category: "deck-events", alt: "Social lounge" },
-    { id: 4, src: "/images/gallery/social-lounge/pr60139.jpg", category: "deck-events", alt: "Social lounge" },
     { id: 5, src: "/images/gallery/social-lounge/pr60148.jpg", category: "deck-events", alt: "Social lounge" },
-    { id: 6, src: "/images/gallery/social-lounge/pr60432.jpg", category: "deck-events", alt: "Social lounge" },
-    { id: 7, src: "/images/gallery/social-lounge/pr60434.jpg", category: "deck-events", alt: "Social lounge" },
     { id: 8, src: "/images/gallery/social-lounge/pr60436.jpg", category: "deck-events", alt: "Social lounge" },
     { id: 9, src: "/images/gallery/social-lounge/pr60438.jpg", category: "deck-events", alt: "Social lounge" },
-    { id: 10, src: "/images/gallery/social-lounge/pr60440.jpg", category: "deck-events", alt: "Social lounge" },
     { id: 11, src: "/images/gallery/the-villa/pr60172.jpg", category: "interiors", alt: "The Villa" },
     { id: 12, src: "/images/gallery/the-villa/pr60174.jpg", category: "interiors", alt: "The Villa" },
-    { id: 13, src: "/images/gallery/the-villa/pr60177.jpg", category: "interiors", alt: "The Villa" },
-    { id: 14, src: "/images/gallery/the-villa/pr60181.jpg", category: "interiors", alt: "The Villa" },
-    { id: 15, src: "/images/gallery/the-villa/pr60187.jpg", category: "interiors", alt: "The Villa" },
-    { id: 16, src: "/images/gallery/the-villa/pr60189.jpg", category: "interiors", alt: "The Villa" },
-    { id: 17, src: "/images/gallery/the-villa/pr60192.jpg", category: "interiors", alt: "The Villa" },
     { id: 18, src: "/images/gallery/the-villa/pr60198.jpg", category: "interiors", alt: "The Villa" },
-    { id: 19, src: "/images/gallery/the-villa/pr60206.jpg", category: "interiors", alt: "The Villa" },
-    { id: 20, src: "/images/gallery/the-villa/pr60213-hdr.jpg", category: "interiors", alt: "The Villa" },
     { id: 21, src: "/images/gallery/the-villa/pr60221.jpg", category: "interiors", alt: "The Villa" },
-    { id: 22, src: "/images/gallery/the-villa/pr60230.jpg", category: "interiors", alt: "The Villa" },
     { id: 23, src: "/images/gallery/the-villa/pr60239.jpg", category: "interiors", alt: "The Villa" },
     { id: 24, src: "/images/gallery/the-villa/pr60240.jpg", category: "interiors", alt: "The Villa" },
     { id: 25, src: "/images/gallery/the-villa/pr60244.jpg", category: "interiors", alt: "The Villa" },
-    { id: 26, src: "/images/gallery/the-villa/pr60258.jpg", category: "interiors", alt: "The Villa" },
-    { id: 27, src: "/images/gallery/the-villa/pr60264.jpg", category: "interiors", alt: "The Villa" },
-    { id: 28, src: "/images/gallery/the-villa/pr60266.jpg", category: "interiors", alt: "The Villa" },
-    { id: 29, src: "/images/gallery/the-villa/pr60274-hdr.jpg", category: "interiors", alt: "The Villa" },
     { id: 30, src: "/images/gallery/the-villa/pr60281.jpg", category: "interiors", alt: "The Villa" },
     { id: 31, src: "/images/gallery/the-villa/pr60284.jpg", category: "interiors", alt: "The Villa" },
     { id: 32, src: "/images/gallery/the-villa/pr60291.jpg", category: "interiors", alt: "The Villa" },
     { id: 33, src: "/images/gallery/the-villa/pr60295.jpg", category: "interiors", alt: "The Villa" },
-    { id: 34, src: "/images/gallery/the-villa/pr60296.jpg", category: "interiors", alt: "The Villa" },
-    { id: 35, src: "/images/gallery/the-villa/pr60301.jpg", category: "interiors", alt: "The Villa" },
-    { id: 36, src: "/images/gallery/the-villa/pr60303.jpg", category: "interiors", alt: "The Villa" },
-    { id: 37, src: "/images/gallery/the-villa/pr60304.jpg", category: "interiors", alt: "The Villa" },
-    { id: 38, src: "/images/gallery/the-villa/pr60307.jpg", category: "interiors", alt: "The Villa" },
-    { id: 39, src: "/images/gallery/the-villa/pr60311.jpg", category: "interiors", alt: "The Villa" },
     { id: 40, src: "/images/gallery/the-villa/pr60314.jpg", category: "interiors", alt: "The Villa" },
     { id: 41, src: "/images/gallery/the-villa/pr60317.jpg", category: "interiors", alt: "The Villa" },
-    { id: 42, src: "/images/gallery/the-villa/pr60320.jpg", category: "interiors", alt: "The Villa" },
-    { id: 43, src: "/images/gallery/the-villa/pr60326.jpg", category: "interiors", alt: "The Villa" },
-    { id: 44, src: "/images/gallery/the-villa/pr60329.jpg", category: "interiors", alt: "The Villa" },
-    { id: 45, src: "/images/gallery/the-villa/pr60333.jpg", category: "interiors", alt: "The Villa" },
     { id: 46, src: "/images/gallery/the-villa/pr60338.jpg", category: "interiors", alt: "The Villa" },
-    { id: 47, src: "/images/gallery/the-villa/pr60341.jpg", category: "interiors", alt: "The Villa" },
     { id: 48, src: "/images/gallery/chalets/pr60028.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 49, src: "/images/gallery/chalets/pr60030.jpg", category: "interiors", alt: "Swim-up pool chalet" },
-    { id: 50, src: "/images/gallery/chalets/pr60031.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 51, src: "/images/gallery/chalets/pr60036.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 52, src: "/images/gallery/chalets/pr60038.jpg", category: "interiors", alt: "Swim-up pool chalet" },
-    { id: 53, src: "/images/gallery/chalets/pr60040.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 54, src: "/images/gallery/chalets/pr60042.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 55, src: "/images/gallery/chalets/pr60046.jpg", category: "interiors", alt: "Swim-up pool chalet" },
-    { id: 56, src: "/images/gallery/chalets/pr60062.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 57, src: "/images/gallery/chalets/pr60064.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 58, src: "/images/gallery/chalets/pr60070.jpg", category: "interiors", alt: "Swim-up pool chalet" },
-    { id: 59, src: "/images/gallery/chalets/pr60071.jpg", category: "interiors", alt: "Swim-up pool chalet" },
-    { id: 60, src: "/images/gallery/chalets/pr60078.jpg", category: "interiors", alt: "Swim-up pool chalet" },
     { id: 61, src: "/images/gallery/deluxe-rm/pr60149.jpg", category: "interiors", alt: "Deluxe room" },
-    { id: 62, src: "/images/gallery/deluxe-rm/pr60150.jpg", category: "interiors", alt: "Deluxe room" },
-    { id: 63, src: "/images/gallery/deluxe-rm/pr60153.jpg", category: "interiors", alt: "Deluxe room" },
     { id: 64, src: "/images/gallery/deluxe-rm/pr60155.jpg", category: "interiors", alt: "Deluxe room" },
     { id: 65, src: "/images/gallery/deluxe-rm/pr60156.jpg", category: "interiors", alt: "Deluxe room" },
-    { id: 66, src: "/images/gallery/deluxe-rm/pr60161.jpg", category: "interiors", alt: "Deluxe room" },
     { id: 67, src: "/images/gallery/standard-rm/pr60164.jpg", category: "interiors", alt: "Standard room" },
-    { id: 68, src: "/images/gallery/standard-rm/pr60166.jpg", category: "interiors", alt: "Standard room" },
     { id: 69, src: "/images/gallery/standard-rm/pr60169.jpg", category: "interiors", alt: "Standard room" },
 ];
 
@@ -127,10 +90,7 @@ export default function GalleryPage() {
 
     const visibleImages =
         activeCategory === "all"
-            ? galleryImages.filter(
-                (image, index, list) =>
-                    list.findIndex((entry) => entry.src === image.src) === index
-            )
+            ? galleryImages
             : galleryImages.filter((image) => image.category === activeCategory);
 
     return (
